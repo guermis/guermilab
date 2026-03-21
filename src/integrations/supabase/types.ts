@@ -14,7 +14,236 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      content_blocks: {
+        Row: {
+          alt: string | null
+          block_type: string
+          body: string | null
+          caption: string | null
+          created_at: string
+          heading: string | null
+          id: string
+          project_id: string
+          quote_author: string | null
+          quote_text: string | null
+          sort_order: number
+          src: string | null
+          updated_at: string
+        }
+        Insert: {
+          alt?: string | null
+          block_type: string
+          body?: string | null
+          caption?: string | null
+          created_at?: string
+          heading?: string | null
+          id?: string
+          project_id: string
+          quote_author?: string | null
+          quote_text?: string | null
+          sort_order?: number
+          src?: string | null
+          updated_at?: string
+        }
+        Update: {
+          alt?: string | null
+          block_type?: string
+          body?: string | null
+          caption?: string | null
+          created_at?: string
+          heading?: string | null
+          id?: string
+          project_id?: string
+          quote_author?: string | null
+          quote_text?: string | null
+          sort_order?: number
+          src?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_blocks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_themes: {
+        Row: {
+          color_accent: string | null
+          color_background: string | null
+          color_foreground: string | null
+          color_primary: string | null
+          color_secondary: string | null
+          created_at: string
+          font_body: string | null
+          font_display: string | null
+          id: string
+          project_id: string
+          spacing_base: number | null
+          updated_at: string
+        }
+        Insert: {
+          color_accent?: string | null
+          color_background?: string | null
+          color_foreground?: string | null
+          color_primary?: string | null
+          color_secondary?: string | null
+          created_at?: string
+          font_body?: string | null
+          font_display?: string | null
+          id?: string
+          project_id: string
+          spacing_base?: number | null
+          updated_at?: string
+        }
+        Update: {
+          color_accent?: string | null
+          color_background?: string | null
+          color_foreground?: string | null
+          color_primary?: string | null
+          color_secondary?: string | null
+          created_at?: string
+          font_body?: string | null
+          font_display?: string | null
+          id?: string
+          project_id?: string
+          spacing_base?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      projects: {
+        Row: {
+          category: string | null
+          client_name: string | null
+          context: string | null
+          created_at: string
+          duration: string | null
+          execution: string | null
+          hero_image_url: string | null
+          id: string
+          is_published: boolean
+          long_description: string | null
+          main_video_url: string | null
+          result: string | null
+          role_title: string | null
+          short_description: string | null
+          slug: string
+          sort_order: number
+          tags: string[] | null
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          year: string | null
+        }
+        Insert: {
+          category?: string | null
+          client_name?: string | null
+          context?: string | null
+          created_at?: string
+          duration?: string | null
+          execution?: string | null
+          hero_image_url?: string | null
+          id?: string
+          is_published?: boolean
+          long_description?: string | null
+          main_video_url?: string | null
+          result?: string | null
+          role_title?: string | null
+          short_description?: string | null
+          slug: string
+          sort_order?: number
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          year?: string | null
+        }
+        Update: {
+          category?: string | null
+          client_name?: string | null
+          context?: string | null
+          created_at?: string
+          duration?: string | null
+          execution?: string | null
+          hero_image_url?: string | null
+          id?: string
+          is_published?: boolean
+          long_description?: string | null
+          main_video_url?: string | null
+          result?: string | null
+          role_title?: string | null
+          short_description?: string | null
+          slug?: string
+          sort_order?: number
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          year?: string | null
+        }
+        Relationships: []
+      }
+      theme_settings: {
+        Row: {
+          border_radius: number
+          color_accent: string
+          color_background: string
+          color_border: string
+          color_foreground: string
+          color_muted: string
+          color_primary: string
+          color_secondary: string
+          created_at: string
+          font_body: string
+          font_display: string
+          id: string
+          is_active: boolean
+          name: string
+          spacing_base: number
+          updated_at: string
+        }
+        Insert: {
+          border_radius?: number
+          color_accent?: string
+          color_background?: string
+          color_border?: string
+          color_foreground?: string
+          color_muted?: string
+          color_primary?: string
+          color_secondary?: string
+          created_at?: string
+          font_body?: string
+          font_display?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          spacing_base?: number
+          updated_at?: string
+        }
+        Update: {
+          border_radius?: number
+          color_accent?: string
+          color_background?: string
+          color_border?: string
+          color_foreground?: string
+          color_muted?: string
+          color_primary?: string
+          color_secondary?: string
+          created_at?: string
+          font_body?: string
+          font_display?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          spacing_base?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
