@@ -14,6 +14,74 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_suggestions: {
+        Row: {
+          created_at: string
+          id: string
+          is_applied: boolean
+          project_id: string | null
+          suggestion_data: Json
+          suggestion_type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_applied?: boolean
+          project_id?: string | null
+          suggestion_data?: Json
+          suggestion_type: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_applied?: boolean
+          project_id?: string | null
+          suggestion_data?: Json
+          suggestion_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_suggestions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      analytics_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          page_path: string
+          project_slug: string | null
+          session_id: string
+          value: number | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          page_path: string
+          project_slug?: string | null
+          session_id: string
+          value?: number | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          page_path?: string
+          project_slug?: string | null
+          session_id?: string
+          value?: number | null
+        }
+        Relationships: []
+      }
       content_blocks: {
         Row: {
           alt: string | null

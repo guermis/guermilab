@@ -5,11 +5,13 @@ import { getProjectBySlug } from '@/data/projects';
 import { ContentBlockRenderer } from '@/components/portfolio/ContentBlockRenderer';
 import { useInView } from '@/hooks/useInView';
 import { useEffect } from 'react';
+import { useAnalytics } from '@/hooks/useAnalytics';
 
 export default function ProjectDetail() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const project = getProjectBySlug(slug || '');
+  const { trackClick } = useAnalytics(slug);
   const { ref: metaRef, isInView: metaVisible } = useInView();
 
   useEffect(() => {
