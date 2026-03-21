@@ -56,7 +56,7 @@ function ImageBlock({ block, index }: ContentBlockRendererProps) {
 function QuoteBlock({ block, index }: ContentBlockRendererProps) {
   const { ref, isInView } = useInView();
   return (
-    <blockquote
+    <div
       ref={ref}
       className={`mt-16 border-l-2 border-primary/40 pl-6 py-2 max-w-xl ${isInView ? 'animate-fade-in' : 'opacity-0'}`}
       style={{ animationDelay: `${index * 100}ms` }}
