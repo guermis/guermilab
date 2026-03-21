@@ -69,7 +69,7 @@ function QuoteBlock({ block, index }: ContentBlockRendererProps) {
           — {block.author}
         </cite>
       )}
-    </blockquote>
+    </div>
   );
 }
 
