@@ -22,14 +22,14 @@ export function useAnalytics(projectSlug?: string) {
     metadata?: Record<string, unknown>
   ) => {
     try {
-      await supabase.from('analytics_events').insert({
+      await supabase.from('analytics_events').insert([{
         event_type: eventType,
         project_slug: projectSlug || null,
         page_path: window.location.pathname,
-        value: value || null,
-        metadata: metadata || {},
+        value: value ?? null,
+        metadata: (metadata || {}) as Record<string, unknown>,
         session_id: sessionId.current,
-      });
+      }]);
     } catch {
       // Silent fail for analytics
     }
