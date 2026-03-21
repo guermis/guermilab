@@ -28,7 +28,7 @@ export function useAnalytics(projectSlug?: string) {
         project_slug: projectSlug || null,
         page_path: window.location.pathname,
         value: value ?? null,
-        metadata: (metadata || {}) as Record<string, unknown>,
+        metadata: (metadata || {}) as Json,
         session_id: sessionId.current,
       }]);
     } catch {
