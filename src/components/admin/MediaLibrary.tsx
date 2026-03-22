@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Upload, X, Trash2, Copy, Check, Image, Film, FileText, Search, Grid, List, RefreshCw } from 'lucide-react';
+import { Upload, Trash2, Copy, Check, Image, Film, FileText, Search, Grid, List, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
