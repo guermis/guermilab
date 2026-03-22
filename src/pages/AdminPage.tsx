@@ -1,24 +1,29 @@
 import { useState } from 'react';
 import { AnalyticsDashboard } from '@/components/admin/AnalyticsDashboard';
 import { AutoTagSuggest } from '@/components/admin/AutoTagSuggest';
-import { BarChart3, Sparkles, ArrowLeft } from 'lucide-react';
+import { MediaLibrary } from '@/components/admin/MediaLibrary';
+import { BarChart3, Sparkles, ArrowLeft, Image } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-type Tab = 'analytics' | 'ai';
+type Tab = 'analytics' | 'ai' | 'media';
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<Tab>('analytics');
+  const [activeTab, setActiveTab] = useState<Tab>('media');
   const navigate = useNavigate();
 
-  // Demo state for auto-tag testing
   const [demoTitle, setDemoTitle] = useState('');
   const [demoDesc, setDemoDesc] = useState('');
   const [demoCategory, setDemoCategory] = useState('');
   const [demoTags, setDemoTags] = useState<string[]>([]);
 
+  const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
+    { id: 'media', label: 'Mídia', icon: <Image className="h-3.5 w-3.5" /> },
+    { id: 'analytics', label: 'Analytics', icon: <BarChart3 className="h-3.5 w-3.5" /> },
+    { id: 'ai', label: 'IA & Automação', icon: <Sparkles className="h-3.5 w-3.5" /> },
+  ];
+
   return (
     <main className="min-h-screen bg-background">
-      {/* Header */}
       <header className="border-b border-border px-6 py-4 md:px-16 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button
@@ -33,38 +38,28 @@ export default function AdminPage() {
         </div>
       </header>
 
-      {/* Tabs */}
       <div className="border-b border-border px-6 md:px-16">
         <div className="flex gap-0">
-          <button
-            onClick={() => setActiveTab('analytics')}
-            className={`px-4 py-3 text-xs tracking-[0.15em] uppercase font-body flex items-center gap-2 border-b-2 transition-colors ${
-              activeTab === 'analytics'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <BarChart3 className="h-3.5 w-3.5" />
-            Analytics
-          </button>
-          <button
-            onClick={() => setActiveTab('ai')}
-            className={`px-4 py-3 text-xs tracking-[0.15em] uppercase font-body flex items-center gap-2 border-b-2 transition-colors ${
-              activeTab === 'ai'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <Sparkles className="h-3.5 w-3.5" />
-            IA & Automação
-          </button>
+          {tabs.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`px-4 py-3 text-xs tracking-[0.15em] uppercase font-body flex items-center gap-2 border-b-2 transition-colors ${
+                activeTab === tab.id
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {tab.icon}
+              {tab.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Content */}
       <div className="px-6 py-8 md:px-16 max-w-5xl">
+        {activeTab === 'media' && <MediaLibrary />}
         {activeTab === 'analytics' && <AnalyticsDashboard />}
-
         {activeTab === 'ai' && (
           <div className="space-y-8">
             <div>
@@ -73,7 +68,6 @@ export default function AdminPage() {
                 Insira informações de um projeto e a IA sugerirá tags e descrição automaticamente.
               </p>
             </div>
-
             <div className="rounded-sm border border-border bg-card p-4 space-y-3 max-w-xl">
               <input
                 type="text"
@@ -96,7 +90,6 @@ export default function AdminPage() {
                 onChange={(e) => setDemoCategory(e.target.value)}
                 className="w-full rounded-sm border border-border bg-secondary px-3 py-2 text-sm text-foreground font-body placeholder:text-muted-foreground"
               />
-
               {demoTags.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
                   {demoTags.map(tag => (
@@ -106,7 +99,6 @@ export default function AdminPage() {
                   ))}
                 </div>
               )}
-
               <AutoTagSuggest
                 title={demoTitle}
                 description={demoDesc}
