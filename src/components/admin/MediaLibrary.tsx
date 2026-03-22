@@ -99,8 +99,7 @@ export function MediaLibrary() {
     const validItems = items.filter(i => i.status === 'pending');
 
     for (const item of validItems) {
-      const idx = items.indexOf(item);
-      setUploads(prev => prev.map((u, i) =>
+      setUploads(prev => prev.map(u =>
         u.file === item.file ? { ...u, status: 'uploading', progress: 10 } : u
       ));
 
