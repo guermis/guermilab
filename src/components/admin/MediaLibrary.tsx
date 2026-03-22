@@ -277,7 +277,7 @@ export function MediaLibrary() {
                     <Progress value={u.progress} className="h-1" />
                   </div>
                 )}
-                {u.status === 'done' && <Check className="h-3.5 w-3.5 text-green-500" />}
+                {u.status === 'done' && <Check className="h-3.5 w-3.5 text-primary" />}
                 {u.status === 'error' && (
                   <span className="text-[10px] text-destructive font-body">{u.error}</span>
                 )}
