@@ -218,14 +218,17 @@ export type Database = {
       }
       projects: {
         Row: {
+          access_password: string | null
           category: string | null
           client_name: string | null
           context: string | null
           created_at: string
+          director_notes: Json | null
           duration: string | null
           execution: string | null
           hero_image_url: string | null
           id: string
+          is_private: boolean
           is_published: boolean
           long_description: string | null
           main_video_url: string | null
@@ -241,14 +244,17 @@ export type Database = {
           year: string | null
         }
         Insert: {
+          access_password?: string | null
           category?: string | null
           client_name?: string | null
           context?: string | null
           created_at?: string
+          director_notes?: Json | null
           duration?: string | null
           execution?: string | null
           hero_image_url?: string | null
           id?: string
+          is_private?: boolean
           is_published?: boolean
           long_description?: string | null
           main_video_url?: string | null
@@ -264,14 +270,17 @@ export type Database = {
           year?: string | null
         }
         Update: {
+          access_password?: string | null
           category?: string | null
           client_name?: string | null
           context?: string | null
           created_at?: string
+          director_notes?: Json | null
           duration?: string | null
           execution?: string | null
           hero_image_url?: string | null
           id?: string
+          is_private?: boolean
           is_published?: boolean
           long_description?: string | null
           main_video_url?: string | null

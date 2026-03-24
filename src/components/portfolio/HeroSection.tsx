@@ -30,36 +30,7 @@ export function HeroSection() {
       {/* Content */}
       <div className="relative z-20 flex h-full flex-col justify-end px-6 pb-24 md:px-16 lg:px-24">
         {/* Top nav */}
-        <motion.nav
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 1 }}
-          className="absolute top-0 left-0 right-0 flex items-center justify-between px-6 py-6 md:px-16 lg:px-24"
-        >
-          <span className="font-display text-lg tracking-widest text-foreground uppercase">
-            Filmmaker
-          </span>
-          <div className="flex items-center gap-8">
-            <button
-              onClick={scrollToWork}
-              className="text-xs tracking-[0.2em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-300"
-            >
-              Trabalhos
-            </button>
-            <a
-              href="#about"
-              className="text-xs tracking-[0.2em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-300"
-            >
-              Sobre
-            </a>
-            <a
-              href="#contact"
-              className="text-xs tracking-[0.2em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-300"
-            >
-              Contato
-            </a>
-          </div>
-        </motion.nav>
+        {/* Nav handled by NetflixNav */}
 
         {/* Hero text */}
         <div className="max-w-4xl">
