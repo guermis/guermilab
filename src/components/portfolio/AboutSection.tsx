@@ -11,11 +11,11 @@ export function AboutSection() {
   const { ref, isInView } = useInView();
 
   return (
-    <section id="about" className="relative px-6 py-24 md:px-16 lg:px-24 border-t border-border">
+    <section id="about" className="relative py-20 mt-8">
       <div ref={ref} className="mx-auto max-w-5xl">
-        <div className={`grid gap-16 md:grid-cols-2 ${isInView ? 'animate-fade-in' : 'opacity-0'}`}>
+        <div className={`grid gap-12 md:grid-cols-2 ${isInView ? 'animate-fade-in' : 'opacity-0'}`}>
           {/* Text */}
-          <div>
+          <div className="glass rounded-2xl p-8 glass-glow">
             <span className="text-[10px] tracking-[0.3em] uppercase text-primary font-body">
               Sobre
             </span>
@@ -36,14 +36,14 @@ export function AboutSection() {
           </div>
 
           {/* Stats */}
-          <div className="flex flex-col justify-center gap-8">
+          <div className="flex flex-col justify-center gap-6">
             {STATS.map((stat, i) => (
               <div
                 key={stat.label}
-                className={`flex items-center gap-5 ${isInView ? 'animate-slide-up' : 'opacity-0'}`}
+                className={`glass rounded-xl p-5 flex items-center gap-5 glass-glow ${isInView ? 'animate-slide-up' : 'opacity-0'}`}
                 style={{ animationDelay: `${400 + i * 200}ms` }}
               >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-sm border border-border bg-secondary">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10">
                   <stat.icon className="h-5 w-5 text-primary" />
                 </div>
                 <div>
