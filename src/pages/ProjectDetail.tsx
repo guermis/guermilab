@@ -20,7 +20,7 @@ export default function ProjectDetail() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const project = getProjectBySlug(slug || '');
-  const { trackClick } = useAnalytics(slug);
+  useAnalytics(slug);
   const { ref: metaRef, isInView: metaVisible } = useInView();
 
   const [presentationMode, setPresentationMode] = useState(false);
