@@ -47,7 +47,7 @@ export default function ProjectDetail() {
       if (data) {
         setIsPrivate(data.is_private);
         if (data.director_notes && Array.isArray(data.director_notes)) {
-          setDirectorNotes(data.director_notes as DirectorNote[]);
+          setDirectorNotes(data.director_notes as unknown as DirectorNote[]);
         }
         // Check session storage for previously unlocked
         if (data.is_private && sessionStorage.getItem(`unlock_${project.title}`)) {
