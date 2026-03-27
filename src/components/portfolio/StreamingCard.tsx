@@ -23,7 +23,7 @@ export function StreamingCard({ slug, title, category, year, thumbnail, duration
     <div
       ref={ref}
       className={`snap-start shrink-0 ${isInView ? 'animate-fade-in' : 'opacity-0'}`}
-      style={{ animationDelay: `${index * 80}ms` }}
+      style={{ animationDelay: `${index * 100}ms` }}
     >
       <div
         ref={cardRef}
@@ -33,81 +33,78 @@ export function StreamingCard({ slug, title, category, year, thumbnail, duration
         className="relative cursor-pointer group w-[280px] md:w-[320px]"
       >
         {/* Thumbnail container */}
-        <div className="relative overflow-hidden rounded-xl aspect-video">
+        <div className="relative overflow-hidden rounded-2xl aspect-video">
           {/* Image */}
           <img
             src={thumbnail}
             alt={title}
             loading="lazy"
-            className="h-full w-full object-cover transition-all duration-700 ease-out"
+            className="h-full w-full object-cover transition-all duration-[800ms] ease-out"
             style={{
-              transform: isHovered ? 'scale(1.08)' : 'scale(1)',
-              filter: isHovered ? 'brightness(1.15) contrast(1.1)' : 'brightness(0.85)',
+              transform: isHovered ? 'scale(1.06)' : 'scale(1)',
+              filter: isHovered ? 'brightness(1.2) contrast(1.05)' : 'brightness(0.8)',
             }}
           />
 
-          {/* Glass overlay on hover */}
+          {/* Gradient overlay */}
           <div
-            className="absolute inset-0 transition-all duration-500 pointer-events-none"
+            className="absolute inset-0 transition-all duration-[600ms] ease-out pointer-events-none"
             style={{
               background: isHovered
-                ? 'linear-gradient(180deg, transparent 30%, hsla(220, 20%, 6%, 0.85) 100%)'
-                : 'linear-gradient(180deg, transparent 50%, hsla(220, 20%, 6%, 0.6) 100%)',
+                ? 'linear-gradient(180deg, transparent 40%, hsla(225, 12%, 5%, 0.9) 100%)'
+                : 'linear-gradient(180deg, transparent 60%, hsla(225, 12%, 5%, 0.5) 100%)',
             }}
           />
 
-          {/* Inner glow border */}
+          {/* Border glow on hover */}
           <div
-            className="absolute inset-0 rounded-xl transition-all duration-500 pointer-events-none"
+            className="absolute inset-0 rounded-2xl transition-all duration-[600ms] ease-out pointer-events-none"
             style={{
               boxShadow: isHovered
-                ? 'inset 0 0 0 1px hsla(220, 60%, 60%, 0.3), 0 8px 32px -8px hsla(220, 60%, 60%, 0.2)'
-                : 'inset 0 0 0 1px hsla(220, 20%, 30%, 0.15)',
+                ? 'inset 0 0 0 1px hsla(0, 0%, 100%, 0.15), 0 12px 40px -8px hsla(0, 0%, 0%, 0.5)'
+                : 'inset 0 0 0 1px hsla(0, 0%, 100%, 0.04), 0 4px 16px -4px hsla(0, 0%, 0%, 0.3)',
             }}
           />
 
           {/* Play button */}
           <div
-            className="absolute inset-0 flex items-center justify-center transition-all duration-500"
-            style={{ opacity: isHovered ? 1 : 0, transform: isHovered ? 'scale(1)' : 'scale(0.8)' }}
+            className="absolute inset-0 flex items-center justify-center transition-all duration-[600ms] ease-out"
+            style={{ opacity: isHovered ? 1 : 0, transform: isHovered ? 'scale(1)' : 'scale(0.85)' }}
           >
-            <div className="flex h-11 w-11 items-center justify-center rounded-full glass glass-glow">
-              <Play className="h-4 w-4 text-foreground ml-0.5" fill="currentColor" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[hsla(0,0%,100%,0.15)] backdrop-blur-xl border border-[hsla(0,0%,100%,0.12)]">
+              <Play className="h-5 w-5 text-foreground ml-0.5" fill="currentColor" />
             </div>
           </div>
 
           {/* Duration badge */}
           {duration && (
-            <div className="absolute top-3 right-3 flex items-center gap-1 glass rounded-md px-2 py-1">
-              <Clock className="h-3 w-3 text-muted-foreground" />
-              <span className="text-[10px] text-muted-foreground font-body">{duration}</span>
+            <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-[hsla(0,0%,0%,0.5)] backdrop-blur-lg rounded-lg px-2.5 py-1 border border-[hsla(0,0%,100%,0.06)]">
+              <Clock className="h-3 w-3 text-foreground/60" />
+              <span className="text-[10px] text-foreground/60 font-medium">{duration}</span>
             </div>
           )}
 
-          {/* Category badge */}
-          <div className="absolute top-3 left-3">
-            <span className="glass rounded-md px-2 py-1 text-[10px] tracking-[0.1em] uppercase text-muted-foreground font-body">
-              {category}
-            </span>
-          </div>
-
-          {/* Bottom info (visible on hover) */}
+          {/* Bottom info on hover */}
           <div
-            className="absolute bottom-0 left-0 right-0 p-4 transition-all duration-500"
-            style={{ opacity: isHovered ? 1 : 0, transform: isHovered ? 'translateY(0)' : 'translateY(8px)' }}
+            className="absolute bottom-0 left-0 right-0 p-4 transition-all duration-[600ms] ease-out"
+            style={{ opacity: isHovered ? 1 : 0, transform: isHovered ? 'translateY(0)' : 'translateY(6px)' }}
           >
-            <h3 className="font-display text-base text-foreground leading-tight">{title}</h3>
-            <span className="text-[11px] text-muted-foreground font-body">{year}</span>
+            <h3 className="text-[15px] font-semibold text-foreground leading-tight tracking-tight">{title}</h3>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-[11px] text-foreground/40 font-medium">{year}</span>
+              <span className="text-[11px] text-foreground/20">·</span>
+              <span className="text-[11px] text-foreground/40 font-medium">{category}</span>
+            </div>
           </div>
         </div>
 
-        {/* Title below (visible when not hovered) */}
+        {/* Title below — visible when NOT hovered */}
         <div
-          className="mt-2.5 px-1 transition-opacity duration-300"
+          className="mt-3 px-1 transition-all duration-[500ms] ease-out"
           style={{ opacity: isHovered ? 0 : 1 }}
         >
-          <h3 className="font-body text-sm text-foreground/90 truncate">{title}</h3>
-          <span className="text-[11px] text-muted-foreground font-body">{year}</span>
+          <h3 className="text-[13px] font-medium text-foreground/80 truncate tracking-tight">{title}</h3>
+          <span className="text-[11px] text-muted-foreground font-normal">{year}</span>
         </div>
       </div>
     </div>
