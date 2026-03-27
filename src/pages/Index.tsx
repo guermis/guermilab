@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { StreamingHero } from '@/components/portfolio/StreamingHero';
 import { ProjectGrid } from '@/components/portfolio/ProjectGrid';
 import { AboutSection } from '@/components/portfolio/AboutSection';
@@ -6,7 +6,6 @@ import { ContactSection } from '@/components/portfolio/ContactSection';
 import { DynamicCTA } from '@/components/portfolio/DynamicCTA';
 import { StreamingSidebar } from '@/components/portfolio/StreamingSidebar';
 import { useAnalytics } from '@/hooks/useAnalytics';
-import { PROJECTS } from '@/data/projects';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const Index = () => {
@@ -14,11 +13,8 @@ const Index = () => {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const isMobile = useIsMobile();
 
-  const categories = useMemo(() => {
-    const cats = new Set<string>();
-    PROJECTS.forEach(p => cats.add(p.category));
-    return Array.from(cats);
-  }, []);
+  // Sections are now fixed: Vertical, Horizontal, Fotografia
+  const categories = ['Vertical', 'Horizontal', 'Fotografia'];
 
   const handleNavClick = (id: string) => {
     if (id === 'home') {
@@ -37,7 +33,7 @@ const Index = () => {
         onNavClick={handleNavClick}
       />
 
-      <main className={`flex-1 min-h-screen relative z-[1] ${isMobile ? 'px-4 pt-18' : 'ml-[250px] px-10 pt-6'}`}>
+      <main className={`flex-1 min-h-screen relative z-[1] ${isMobile ? 'px-4 pt-18' : 'ml-[255px] px-10 pt-6'}`}>
         <StreamingHero />
         <ProjectGrid activeCategory={activeCategory} />
         <AboutSection />
