@@ -29,48 +29,48 @@ export function StreamingSidebar({ activeCategory, categories, onCategoryClick, 
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const sidebarContent = (
-    <div className="flex flex-col h-full py-6">
+    <div className="flex flex-col h-full py-8">
       {/* Logo */}
-      <div className="px-5 mb-8">
+      <div className="px-6 mb-10">
         <button
           onClick={() => { onCategoryClick(null); setMobileOpen(false); }}
-          className="font-display text-lg tracking-[0.15em] text-foreground uppercase"
+          className="text-foreground text-lg font-semibold tracking-tight"
         >
           Filmmaker
         </button>
       </div>
 
       {/* Navigation */}
-      <div className="px-3 mb-6">
+      <div className="px-4 mb-8">
         {NAV_ITEMS.map(item => (
           <button
             key={item.id}
             onClick={() => { onNavClick(item.id); setMobileOpen(false); }}
-            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-body text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all duration-300"
+            className="flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-[13px] font-medium text-muted-foreground hover:text-foreground hover:bg-[hsla(0,0%,100%,0.06)] transition-all duration-500 ease-out"
           >
-            <item.icon className="h-4 w-4" />
+            <item.icon className="h-[18px] w-[18px] opacity-70" />
             <span>{item.label}</span>
           </button>
         ))}
       </div>
 
       {/* Divider */}
-      <div className="mx-5 h-px bg-border/50 mb-6" />
+      <div className="mx-6 h-px bg-[hsla(0,0%,100%,0.06)] mb-8" />
 
       {/* Categories */}
-      <div className="px-3 flex-1">
-        <p className="px-3 mb-3 text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-body">
+      <div className="px-4 flex-1">
+        <p className="px-4 mb-4 text-[10px] tracking-[0.2em] uppercase text-muted-foreground/60 font-medium">
           Categorias
         </p>
         <button
           onClick={() => { onCategoryClick(null); setMobileOpen(false); }}
-          className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-body transition-all duration-300 ${
+          className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-[13px] font-medium transition-all duration-500 ease-out ${
             activeCategory === null
-              ? 'bg-primary/15 text-foreground glass-glow'
-              : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
+              ? 'bg-[hsla(0,0%,100%,0.1)] text-foreground shadow-[inset_0_1px_0_hsla(0,0%,100%,0.08)]'
+              : 'text-muted-foreground hover:text-foreground hover:bg-[hsla(0,0%,100%,0.06)]'
           }`}
         >
-          <Film className="h-4 w-4" />
+          <Film className="h-[18px] w-[18px] opacity-70" />
           <span>Todos</span>
         </button>
         {categories.map(cat => {
@@ -80,18 +80,19 @@ export function StreamingSidebar({ activeCategory, categories, onCategoryClick, 
             <button
               key={cat}
               onClick={() => { onCategoryClick(cat); setMobileOpen(false); }}
-              className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-body transition-all duration-300 ${
+              className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-[13px] font-medium transition-all duration-500 ease-out ${
                 isActive
-                  ? 'bg-primary/15 text-foreground glass-glow'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
+                  ? 'bg-[hsla(0,0%,100%,0.1)] text-foreground shadow-[inset_0_1px_0_hsla(0,0%,100%,0.08)]'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-[hsla(0,0%,100%,0.06)]'
               }`}
             >
-              <Icon className="h-4 w-4" />
+              <Icon className="h-[18px] w-[18px] opacity-70" />
               <span>{cat}</span>
               {isActive && (
                 <motion.div
                   layoutId="sidebar-active"
-                  className="ml-auto h-1.5 w-1.5 rounded-full bg-primary"
+                  className="ml-auto h-1.5 w-1.5 rounded-full bg-accent"
+                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                 />
               )}
             </button>
@@ -104,15 +105,13 @@ export function StreamingSidebar({ activeCategory, categories, onCategoryClick, 
   if (isMobile) {
     return (
       <>
-        {/* Mobile trigger */}
         <button
           onClick={() => setMobileOpen(true)}
-          className="fixed top-4 left-4 z-[100] glass rounded-xl p-2.5 glass-glow"
+          className="fixed top-4 left-4 z-[100] glass rounded-2xl p-3"
         >
           <Menu className="h-5 w-5 text-foreground" />
         </button>
 
-        {/* Mobile drawer */}
         <AnimatePresence>
           {mobileOpen && (
             <>
@@ -120,19 +119,20 @@ export function StreamingSidebar({ activeCategory, categories, onCategoryClick, 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[100] bg-background/60 backdrop-blur-sm"
+                transition={{ duration: 0.4 }}
+                className="fixed inset-0 z-[100] bg-[hsla(225,12%,5%,0.6)] backdrop-blur-sm"
                 onClick={() => setMobileOpen(false)}
               />
               <motion.aside
-                initial={{ x: -280 }}
-                animate={{ x: 0 }}
-                exit={{ x: -280 }}
-                transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-                className="fixed top-0 left-0 bottom-0 z-[101] w-[260px] glass glass-glow overflow-y-auto"
+                initial={{ x: -300, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -300, opacity: 0 }}
+                transition={{ type: 'spring', damping: 35, stiffness: 250 }}
+                className="fixed top-4 left-4 bottom-4 z-[101] w-[270px] glass rounded-3xl overflow-y-auto"
               >
                 <button
                   onClick={() => setMobileOpen(false)}
-                  className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
+                  className="absolute top-5 right-5 text-muted-foreground hover:text-foreground transition-colors duration-300"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -146,7 +146,7 @@ export function StreamingSidebar({ activeCategory, categories, onCategoryClick, 
   }
 
   return (
-    <aside className="fixed top-0 left-0 bottom-0 z-[90] w-[220px] glass glass-glow overflow-y-auto">
+    <aside className="fixed top-4 left-4 bottom-4 z-[90] w-[230px] glass rounded-3xl overflow-y-auto">
       {sidebarContent}
     </aside>
   );

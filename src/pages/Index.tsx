@@ -29,7 +29,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-ambient">
       <StreamingSidebar
         activeCategory={activeCategory}
         categories={categories}
@@ -37,7 +37,7 @@ const Index = () => {
         onNavClick={handleNavClick}
       />
 
-      <main className={`flex-1 min-h-screen ${isMobile ? 'px-4 pt-16' : 'ml-[220px] px-8 pt-6'}`}>
+      <main className={`flex-1 min-h-screen relative z-[1] ${isMobile ? 'px-4 pt-18' : 'ml-[250px] px-10 pt-6'}`}>
         <StreamingHero />
         <ProjectGrid activeCategory={activeCategory} />
         <AboutSection />
