@@ -7,9 +7,13 @@ interface StreamingRowProps {
   title: string;
   projects: Project[];
   aspect?: '16:9' | '9:16' | '3:4';
+  isPhotography?: boolean;
+  onCardClick?: (project: Project) => void;
+  rightLabel?: string;
+  onRightLabelClick?: () => void;
 }
 
-export function StreamingRow({ title, projects, aspect = '16:9' }: StreamingRowProps) {
+export function StreamingRow({ title, projects, aspect = '16:9', isPhotography = false, onCardClick, rightLabel, onRightLabelClick }: StreamingRowProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -33,14 +37,18 @@ export function StreamingRow({ title, projects, aspect = '16:9' }: StreamingRowP
       {/* Row header */}
       <div className="flex items-center justify-between mb-6 px-1">
         <h3 className="text-lg md:text-xl text-foreground font-semibold tracking-tight">{title}</h3>
-        <span className="text-[10px] tracking-[0.12em] uppercase text-muted-foreground/40 font-medium">
-          {projects.length} {projects.length === 1 ? 'projeto' : 'projetos'}
-        </span>
+        {rightLabel && (
+          <button
+            onClick={onRightLabelClick}
+            className="text-[11px] tracking-[0.12em] uppercase text-accent/70 hover:text-accent font-medium transition-colors"
+          >
+            {rightLabel}
+          </button>
+        )}
       </div>
 
       {/* Scroll container */}
       <div className="relative">
-        {/* Left arrow */}
         {canScrollLeft && (
           <button
             onClick={() => scroll('left')}
@@ -53,7 +61,6 @@ export function StreamingRow({ title, projects, aspect = '16:9' }: StreamingRowP
           </button>
         )}
 
-        {/* Right arrow */}
         {canScrollRight && (
           <button
             onClick={() => scroll('right')}
@@ -66,7 +73,6 @@ export function StreamingRow({ title, projects, aspect = '16:9' }: StreamingRowP
           </button>
         )}
 
-        {/* Cards */}
         <div
           ref={scrollRef}
           onScroll={checkScroll}
@@ -78,11 +84,14 @@ export function StreamingRow({ title, projects, aspect = '16:9' }: StreamingRowP
               slug={project.slug}
               title={project.title}
               category={project.category}
-              year={project.year}
+              client={project.client}
               thumbnail={project.thumbnail}
               duration={project.duration}
+              videoUrl={project.mainVideo}
               aspect={aspect}
               index={i}
+              isPhotography={isPhotography}
+              onCardClick={() => onCardClick?.(project)}
             />
           ))}
         </div>

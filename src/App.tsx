@@ -6,7 +6,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { CustomCursor } from "@/components/portfolio/CustomCursor";
 import { PageTransition } from "@/components/portfolio/PageTransition";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import { ThemeEditor } from "@/components/admin/ThemeEditor";
 import Index from "./pages/Index.tsx";
 import ProjectDetail from "./pages/ProjectDetail.tsx";
 import AdminPage from "./pages/AdminPage.tsx";
@@ -19,7 +18,6 @@ const App = () => (
     <ThemeProvider>
       <TooltipProvider>
         <CustomCursor />
-        <ThemeEditor />
         <Toaster />
         <Sonner />
         <BrowserRouter>

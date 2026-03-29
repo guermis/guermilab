@@ -3,17 +3,20 @@ import { StreamingHero } from '@/components/portfolio/StreamingHero';
 import { ProjectGrid } from '@/components/portfolio/ProjectGrid';
 import { AboutSection } from '@/components/portfolio/AboutSection';
 import { ContactSection } from '@/components/portfolio/ContactSection';
-import { DynamicCTA } from '@/components/portfolio/DynamicCTA';
 import { StreamingSidebar } from '@/components/portfolio/StreamingSidebar';
+import { VideoModal } from '@/components/portfolio/VideoModal';
 import { useAnalytics } from '@/hooks/useAnalytics';
-import { useIsMobile } from '@/hooks/use-mobile';
+import type { Project } from '@/types/project';
 
 const Index = () => {
   useAnalytics();
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const isMobile = useIsMobile();
+  const [videoModal, setVideoModal] = useState<{ isOpen: boolean; videoUrl: string; title: string }>({
+    isOpen: false,
+    videoUrl: '',
+    title: '',
+  });
 
-  // Sections are now fixed: Vertical, Horizontal, Fotografia
   const categories = ['Vertical', 'Horizontal', 'Fotografia'];
 
   const handleNavClick = (id: string) => {
@@ -22,6 +25,12 @@ const Index = () => {
     } else {
       document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
     }
+  };
+
+  const handleVideoClick = (project: Project) => {
+    // For photography, could navigate to album — for now open modal
+    const videoUrl = project.mainVideo || '';
+    setVideoModal({ isOpen: true, videoUrl, title: project.title });
   };
 
   return (
@@ -33,13 +42,19 @@ const Index = () => {
         onNavClick={handleNavClick}
       />
 
-      <main className={`flex-1 min-h-screen relative z-[1] ${isMobile ? 'px-4 pt-18' : 'ml-[255px] px-10 pt-6'}`}>
+      <main className="flex-1 min-h-screen relative z-[1] px-6 md:px-10 pt-18">
         <StreamingHero />
-        <ProjectGrid activeCategory={activeCategory} />
+        <ProjectGrid activeCategory={activeCategory} onVideoClick={handleVideoClick} />
         <AboutSection />
         <ContactSection />
-        <DynamicCTA />
       </main>
+
+      <VideoModal
+        isOpen={videoModal.isOpen}
+        onClose={() => setVideoModal(prev => ({ ...prev, isOpen: false }))}
+        videoUrl={videoModal.videoUrl}
+        title={videoModal.title}
+      />
     </div>
   );
 };
