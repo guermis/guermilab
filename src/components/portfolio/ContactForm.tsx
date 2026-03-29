@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Send, Check, Loader2 } from 'lucide-react';
 
+const WHATSAPP_NUMBER = '5511999999999';
+
 const formSchema = z.object({
   name: z.string().trim().min(2, 'Nome muito curto').max(100),
   email: z.string().trim().email('Email inválido').max(255),
@@ -17,6 +19,21 @@ const formSchema = z.object({
 });
 
 type FormData = z.infer<typeof formSchema>;
+
+function buildWhatsAppUrl(data: FormData): string {
+  const text = [
+    `*Nova mensagem de contato*`,
+    ``,
+    `*Nome:* ${data.name}`,
+    `*Email:* ${data.email}`,
+    data.project_interest ? `*Interesse:* ${data.project_interest}` : '',
+    ``,
+    `*Mensagem:*`,
+    data.message,
+  ].filter(Boolean).join('\n');
+
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+}
 
 export function ContactForm() {
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
@@ -29,12 +46,13 @@ export function ContactForm() {
   const onSubmit = async (data: FormData) => {
     setStatus('sending');
     try {
+      // Save to database
       const { error } = await supabase.from('contact_submissions').insert([{
         name: data.name,
         email: data.email,
         project_interest: data.project_interest || null,
         message: data.message,
-        source: 'form',
+        source: 'whatsapp_form',
         metadata: {
           page: window.location.pathname,
           referrer: document.referrer || null,
@@ -42,6 +60,11 @@ export function ContactForm() {
         },
       }]);
       if (error) throw error;
+
+      // Open WhatsApp with formatted message
+      const whatsappUrl = buildWhatsAppUrl(data);
+      window.open(whatsappUrl, '_blank');
+
       setStatus('sent');
       form.reset();
     } catch {
@@ -52,8 +75,8 @@ export function ContactForm() {
   if (status === 'sent') {
     return (
       <div className="flex flex-col items-center gap-3 py-8 text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 border border-primary/30">
-          <Check className="h-5 w-5 text-primary" />
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 border border-accent/30">
+          <Check className="h-5 w-5 text-accent" />
         </div>
         <p className="text-sm text-foreground font-body">Mensagem enviada com sucesso!</p>
         <p className="text-xs text-muted-foreground font-body">Retornarei em breve.</p>
@@ -142,7 +165,7 @@ export function ContactForm() {
         <Button
           type="submit"
           disabled={status === 'sending'}
-          className="w-full rounded-sm text-xs tracking-[0.15em] uppercase"
+          className="w-full rounded-full text-xs tracking-[0.15em] uppercase bg-accent text-accent-foreground hover:bg-accent/90"
         >
           {status === 'sending' ? (
             <Loader2 className="h-4 w-4 animate-spin" />

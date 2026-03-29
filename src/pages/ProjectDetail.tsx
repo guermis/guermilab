@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Calendar, Clock, User, Tag, Presentation, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Clock, User, Tag } from 'lucide-react';
 import { getProjectBySlug } from '@/data/projects';
 import { ContentBlockRenderer } from '@/components/portfolio/ContentBlockRenderer';
 import { DirectorCommentary } from '@/components/portfolio/DirectorCommentary';
@@ -61,7 +61,7 @@ export default function ProjectDetail() {
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
           <h1 className="font-display text-2xl text-foreground">Projeto não encontrado</h1>
-          <button onClick={() => navigate('/')} className="mt-4 text-sm text-primary hover:underline font-body">
+          <button onClick={() => navigate('/')} className="mt-4 text-sm text-accent hover:underline font-body">
             Voltar ao início
           </button>
         </div>
@@ -97,10 +97,10 @@ export default function ProjectDetail() {
             style={{ filter: 'brightness(0.55)' }}
           />
           <div className="absolute inset-0" style={{
-            background: 'linear-gradient(180deg, hsla(220, 20%, 6%, 0.2) 0%, hsla(220, 20%, 6%, 0.6) 50%, hsla(220, 20%, 6%, 1) 100%)'
+            background: 'linear-gradient(180deg, hsla(0, 0%, 6%, 0.2) 0%, hsla(0, 0%, 6%, 0.6) 50%, hsla(0, 0%, 6%, 1) 100%)'
           }} />
           <div className="absolute inset-0" style={{
-            background: 'linear-gradient(90deg, hsla(220, 20%, 6%, 0.6) 0%, transparent 50%)'
+            background: 'linear-gradient(90deg, hsla(0, 0%, 6%, 0.6) 0%, transparent 50%)'
           }} />
 
           {/* Back button */}
@@ -115,48 +115,19 @@ export default function ProjectDetail() {
             Voltar
           </motion.button>
 
-          {/* Action buttons */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="absolute top-6 right-6 md:right-12 z-20 flex items-center gap-3"
-          >
-            {directorNotes.length > 0 && (
-              <button
-                onClick={() => setDirectorMode(!directorMode)}
-                className={`flex items-center gap-2 rounded-xl px-4 py-2 text-[10px] tracking-[0.15em] uppercase font-body transition-all duration-300 ${
-                  directorMode
-                    ? 'glass bg-primary/20 text-primary glass-glow'
-                    : 'glass text-foreground/70 hover:text-foreground'
-                }`}
-              >
-                <MessageCircle className="h-3 w-3" />
-                Diretor
-              </button>
-            )}
-            <button
-              onClick={() => setPresentationMode(true)}
-              className="flex items-center gap-2 glass rounded-xl px-4 py-2 text-[10px] tracking-[0.15em] uppercase text-foreground/70 hover:text-foreground font-body transition-all duration-300"
-            >
-              <Presentation className="h-3 w-3" />
-              Apresentação
-            </button>
-          </motion.div>
-
           {/* Title overlay */}
           <div className="absolute bottom-0 left-0 right-0 z-20 px-6 pb-12 md:px-12 lg:px-16">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: '3rem' }}
               transition={{ delay: 0.5, duration: 0.6 }}
-              className="h-[1px] bg-primary mb-4"
+              className="h-[1px] bg-accent mb-4"
             />
             <motion.span
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
-              className="glass inline-block rounded-md px-3 py-1 text-[10px] tracking-[0.3em] uppercase text-primary font-body"
+              className="glass inline-block rounded-md px-3 py-1 text-[10px] tracking-[0.3em] uppercase text-accent font-body"
             >
               {project.category}
             </motion.span>
@@ -187,8 +158,8 @@ export default function ProjectDetail() {
           >
             {project.client && (
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                  <User className="h-4 w-4 text-primary" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent/10">
+                  <User className="h-4 w-4 text-accent" />
                 </div>
                 <div>
                   <span className="block text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-body">Cliente</span>
@@ -198,8 +169,8 @@ export default function ProjectDetail() {
             )}
             {project.role && (
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                  <Tag className="h-4 w-4 text-primary" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent/10">
+                  <Tag className="h-4 w-4 text-accent" />
                 </div>
                 <div>
                   <span className="block text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-body">Função</span>
@@ -207,19 +178,10 @@ export default function ProjectDetail() {
                 </div>
               </div>
             )}
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                <Calendar className="h-4 w-4 text-primary" />
-              </div>
-              <div>
-                <span className="block text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-body">Ano</span>
-                <span className="text-sm text-foreground font-body">{project.year}</span>
-              </div>
-            </div>
             {project.duration && (
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                  <Clock className="h-4 w-4 text-primary" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent/10">
+                  <Clock className="h-4 w-4 text-accent" />
                 </div>
                 <div>
                   <span className="block text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-body">Duração</span>
@@ -269,7 +231,7 @@ export default function ProjectDetail() {
               Todos os projetos
             </button>
             <span className="font-display text-sm tracking-widest text-muted-foreground uppercase">
-              Filmmaker
+              Guermi Lab
             </span>
           </div>
         </section>

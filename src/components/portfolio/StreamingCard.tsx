@@ -1,17 +1,19 @@
 import { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Play, Clock } from 'lucide-react';
+import { Play, Clock, Image as ImageIcon } from 'lucide-react';
 import { useInView } from '@/hooks/useInView';
 
 interface StreamingCardProps {
   slug: string;
   title: string;
   category: string;
-  year: string;
+  client?: string;
   thumbnail: string;
   duration?: string;
+  videoUrl?: string;
   aspect?: '16:9' | '9:16' | '3:4';
   index: number;
+  isPhotography?: boolean;
+  onCardClick?: () => void;
 }
 
 const ASPECT_STYLES: Record<string, { width: string; ratio: string }> = {
@@ -20,13 +22,18 @@ const ASPECT_STYLES: Record<string, { width: string; ratio: string }> = {
   '3:4':  { width: 'w-[220px] md:w-[260px]', ratio: 'aspect-[3/4]' },
 };
 
-export function StreamingCard({ slug, title, category, year, thumbnail, duration, aspect = '16:9', index }: StreamingCardProps) {
-  const navigate = useNavigate();
+export function StreamingCard({ slug, title, category, client, thumbnail, duration, videoUrl, aspect = '16:9', index, isPhotography = false, onCardClick }: StreamingCardProps) {
   const { ref, isInView } = useInView();
   const [isHovered, setIsHovered] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const { width, ratio } = ASPECT_STYLES[aspect] || ASPECT_STYLES['16:9'];
+
+  const handleClick = () => {
+    if (onCardClick) {
+      onCardClick();
+    }
+  };
 
   return (
     <div
@@ -36,14 +43,13 @@ export function StreamingCard({ slug, title, category, year, thumbnail, duration
     >
       <div
         ref={cardRef}
-        onClick={() => navigate(`/projeto/${slug}`)}
+        onClick={handleClick}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className={`relative cursor-pointer group ${width}`}
       >
         {/* Thumbnail container */}
         <div className={`relative overflow-hidden rounded-2xl ${ratio}`}>
-          {/* Image */}
           <img
             src={thumbnail}
             alt={title}
@@ -60,8 +66,8 @@ export function StreamingCard({ slug, title, category, year, thumbnail, duration
             className="absolute inset-0 transition-all duration-[600ms] ease-out pointer-events-none"
             style={{
               background: isHovered
-                ? 'linear-gradient(180deg, transparent 30%, hsla(225, 12%, 5%, 0.95) 100%)'
-                : 'linear-gradient(180deg, transparent 50%, hsla(225, 12%, 5%, 0.6) 100%)',
+                ? 'linear-gradient(180deg, transparent 30%, hsla(0, 0%, 4%, 0.95) 100%)'
+                : 'linear-gradient(180deg, transparent 50%, hsla(0, 0%, 4%, 0.6) 100%)',
             }}
           />
 
@@ -75,18 +81,22 @@ export function StreamingCard({ slug, title, category, year, thumbnail, duration
             }}
           />
 
-          {/* Play button */}
+          {/* Center icon */}
           <div
             className="absolute inset-0 flex items-center justify-center transition-all duration-[600ms] ease-out"
             style={{ opacity: isHovered ? 1 : 0, transform: isHovered ? 'scale(1)' : 'scale(0.8)' }}
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[hsla(0,0%,100%,0.15)] backdrop-blur-xl border border-[hsla(0,0%,100%,0.15)]">
-              <Play className="h-5 w-5 text-foreground ml-0.5" fill="currentColor" />
+              {isPhotography ? (
+                <ImageIcon className="h-5 w-5 text-foreground" />
+              ) : (
+                <Play className="h-5 w-5 text-foreground ml-0.5" fill="currentColor" />
+              )}
             </div>
           </div>
 
-          {/* Duration badge */}
-          {duration && (
+          {/* Duration badge (video only) */}
+          {duration && !isPhotography && (
             <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-[hsla(0,0%,0%,0.55)] backdrop-blur-lg rounded-lg px-2.5 py-1 border border-[hsla(0,0%,100%,0.06)]">
               <Clock className="h-3 w-3 text-foreground/60" />
               <span className="text-[10px] text-foreground/60 font-medium">{duration}</span>
@@ -100,9 +110,18 @@ export function StreamingCard({ slug, title, category, year, thumbnail, duration
           >
             <h3 className="text-[14px] font-semibold text-foreground leading-tight tracking-tight">{title}</h3>
             <div className="flex items-center gap-2 mt-1.5">
-              <span className="text-[11px] text-foreground/40 font-medium">{year}</span>
-              <span className="text-[11px] text-foreground/15">·</span>
-              <span className="text-[11px] text-foreground/40 font-medium">{category}</span>
+              {client && (
+                <>
+                  <span className="text-[11px] text-foreground/40 font-medium">{client}</span>
+                  {duration && !isPhotography && <span className="text-[11px] text-foreground/15">·</span>}
+                </>
+              )}
+              {duration && !isPhotography && (
+                <span className="text-[11px] text-foreground/40 font-medium">{duration}</span>
+              )}
+              {isPhotography && (
+                <span className="text-[11px] text-accent font-medium">Ver álbum</span>
+              )}
             </div>
           </div>
         </div>
@@ -113,7 +132,8 @@ export function StreamingCard({ slug, title, category, year, thumbnail, duration
           style={{ opacity: isHovered ? 0 : 1 }}
         >
           <h3 className="text-[13px] font-medium text-foreground/80 truncate tracking-tight">{title}</h3>
-          <span className="text-[11px] text-muted-foreground font-normal">{year}</span>
+          {client && <span className="text-[11px] text-muted-foreground font-normal">{client}</span>}
+          {isPhotography && <span className="text-[11px] text-accent/70 font-normal ml-1">· Ver álbum</span>}
         </div>
       </div>
     </div>
