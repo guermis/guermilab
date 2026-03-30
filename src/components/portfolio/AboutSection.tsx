@@ -9,6 +9,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
 export function AboutSection() {
   const { ref, isInView } = useInView();
   const { data: about } = useAboutContent();
+  const { data: stats } = useAboutStats();
 
   const title = about?.title || 'Guermi Lab';
   const description = about?.description || 'Com mais de uma década de experiência em produção audiovisual, especializo-me em criar narrativas visuais que transcendem o ordinário.';
