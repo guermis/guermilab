@@ -38,6 +38,33 @@ export type Database = {
         }
         Relationships: []
       }
+      about_stats: {
+        Row: {
+          created_at: string
+          icon: string
+          id: string
+          label: string
+          sort_order: number
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          icon?: string
+          id?: string
+          label: string
+          sort_order?: number
+          value: string
+        }
+        Update: {
+          created_at?: string
+          icon?: string
+          id?: string
+          label?: string
+          sort_order?: number
+          value?: string
+        }
+        Relationships: []
+      }
       ai_suggestions: {
         Row: {
           created_at: string
