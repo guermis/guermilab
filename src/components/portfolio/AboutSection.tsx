@@ -1,12 +1,10 @@
 import { useInView } from '@/hooks/useInView';
-import { useAboutContent } from '@/hooks/useSupabaseData';
-import { Camera, Film, Award } from 'lucide-react';
+import { useAboutContent, useAboutStats } from '@/hooks/useSupabaseData';
+import { Camera, Film, Award, Star, Heart, Users, Globe, Zap, type LucideIcon } from 'lucide-react';
 
-const STATS = [
-  { icon: Film, label: 'Projetos', value: '40+' },
-  { icon: Camera, label: 'Anos de Experiência', value: '12' },
-  { icon: Award, label: 'Prêmios', value: '8' },
-];
+const ICON_MAP: Record<string, LucideIcon> = {
+  Film, Camera, Award, Star, Heart, Users, Globe, Zap,
+};
 
 export function AboutSection() {
   const { ref, isInView } = useInView();
