@@ -154,7 +154,9 @@ function HeroManager() {
   };
 
   const handleDelete = async (id: string) => {
-    await supabase.from('hero_images').delete().eq('id', id);
+    const { error } = await supabase.from('hero_images').delete().eq('id', id);
+    if (error) { toast.error('Erro ao deletar: ' + error.message); return; }
+    toast.success('Imagem removida');
     fetchImages();
   };
 
