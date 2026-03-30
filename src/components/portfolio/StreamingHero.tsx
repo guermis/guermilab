@@ -1,28 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useHeroImages } from '@/hooks/useSupabaseData';
 import { PROJECTS } from '@/data/projects';
 
 export function StreamingHero() {
-  const [loaded, setLoaded] = useState(false);
-  const featured = PROJECTS[0];
+  const { data: heroImages } = useHeroImages();
 
-  useEffect(() => {
-    const img = new window.Image();
-    img.src = featured.heroImage;
-    img.onload = () => setLoaded(true);
-  }, [featured.heroImage]);
+  // Use first hero image from DB, fallback to hardcoded
+  const imageUrl = heroImages.length > 0 ? heroImages[0].image_url : PROJECTS[0]?.heroImage || '/placeholder.svg';
 
   return (
     <section className="relative w-full mb-14">
-      <div className={`relative overflow-hidden rounded-3xl aspect-[21/9] transition-all duration-[2s] ease-out ${loaded ? 'opacity-100' : 'opacity-0'}`}>
+      <div className="relative overflow-hidden rounded-3xl aspect-[21/9]">
         <img
-          src={featured.heroImage}
+          src={imageUrl}
           alt="Hero"
           className="absolute inset-0 h-full w-full object-cover"
         />
-        {/* Subtle vignette overlay */}
-        <div className="absolute inset-0" style={{
-          background: 'radial-gradient(ellipse at center, transparent 50%, hsla(0, 0%, 6%, 0.4) 100%)'
-        }} />
       </div>
     </section>
   );
