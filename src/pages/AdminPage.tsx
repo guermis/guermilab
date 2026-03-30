@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -136,18 +137,26 @@ function HeroManager() {
 
   const handleUpload = async (file: File) => {
     setUploading(true);
-    const ext = file.name.split('.').pop();
-    const path = `hero/${Date.now()}.${ext}`;
-    const { error: uploadError } = await supabase.storage.from('media').upload(path, file);
-    if (uploadError) { setUploading(false); return; }
-    const { data: { publicUrl } } = supabase.storage.from('media').getPublicUrl(path);
-    await supabase.from('hero_images').insert({ image_url: publicUrl, sort_order: images.length });
+    try {
+      const ext = file.name.split('.').pop();
+      const path = `hero/${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from('media').upload(path, file);
+      if (uploadError) throw uploadError;
+      const { data: { publicUrl } } = supabase.storage.from('media').getPublicUrl(path);
+      const { error: insertError } = await supabase.from('hero_images').insert({ image_url: publicUrl, sort_order: images.length });
+      if (insertError) throw insertError;
+      toast.success('Imagem hero enviada com sucesso');
+      fetchImages();
+    } catch (err: any) {
+      toast.error('Erro ao enviar imagem: ' + (err?.message || 'Erro desconhecido'));
+    }
     setUploading(false);
-    fetchImages();
   };
 
   const handleDelete = async (id: string) => {
-    await supabase.from('hero_images').delete().eq('id', id);
+    const { error } = await supabase.from('hero_images').delete().eq('id', id);
+    if (error) { toast.error('Erro ao deletar: ' + error.message); return; }
+    toast.success('Imagem removida');
     fetchImages();
   };
 
@@ -205,28 +214,36 @@ function VideoManager({ type }: { type: 'vertical' | 'horizontal' }) {
 
   const handleSave = async () => {
     setUploading(true);
-    if (editId) {
-      await supabase.from(table).update({
-        title: form.title,
-        client: form.client || null,
-        duration: form.duration || null,
-        video_url: form.video_url || null,
-        thumbnail_url: form.thumbnail_url || null,
-      }).eq('id', editId);
-    } else {
-      await supabase.from(table).insert({
-        title: form.title,
-        client: form.client || null,
-        duration: form.duration || null,
-        video_url: form.video_url || null,
-        thumbnail_url: form.thumbnail_url || null,
-        sort_order: items.length,
-      });
+    try {
+      if (editId) {
+        const { error } = await supabase.from(table).update({
+          title: form.title,
+          client: form.client || null,
+          duration: form.duration || null,
+          video_url: form.video_url || null,
+          thumbnail_url: form.thumbnail_url || null,
+        }).eq('id', editId);
+        if (error) throw error;
+        toast.success('Vídeo atualizado');
+      } else {
+        const { error } = await supabase.from(table).insert({
+          title: form.title,
+          client: form.client || null,
+          duration: form.duration || null,
+          video_url: form.video_url || null,
+          thumbnail_url: form.thumbnail_url || null,
+          sort_order: items.length,
+        });
+        if (error) throw error;
+        toast.success('Vídeo adicionado');
+      }
+      setForm({ title: '', client: '', duration: '', video_url: '', thumbnail_url: '' });
+      setEditId(null);
+      fetchItems();
+    } catch (err: any) {
+      toast.error('Erro: ' + (err?.message || 'Erro desconhecido'));
     }
-    setForm({ title: '', client: '', duration: '', video_url: '', thumbnail_url: '' });
-    setEditId(null);
     setUploading(false);
-    fetchItems();
   };
 
   const handleEdit = (item: VideoItem) => {
@@ -241,7 +258,9 @@ function VideoManager({ type }: { type: 'vertical' | 'horizontal' }) {
   };
 
   const handleDelete = async (id: string) => {
-    await supabase.from(table).delete().eq('id', id);
+    const { error } = await supabase.from(table).delete().eq('id', id);
+    if (error) { toast.error('Erro ao deletar: ' + error.message); return; }
+    toast.success('Vídeo removido');
     fetchItems();
   };
 
@@ -340,19 +359,25 @@ function AlbumManager() {
 
   const createAlbum = async () => {
     if (!newAlbumTitle.trim()) return;
-    await supabase.from('photography_albums').insert({ title: newAlbumTitle.trim(), sort_order: albums.length });
+    const { error } = await supabase.from('photography_albums').insert({ title: newAlbumTitle.trim(), sort_order: albums.length });
+    if (error) { toast.error('Erro ao criar álbum: ' + error.message); return; }
+    toast.success('Álbum criado');
     setNewAlbumTitle('');
     fetchAlbums();
   };
 
   const updateAlbumTitle = async (id: string) => {
-    await supabase.from('photography_albums').update({ title: editAlbumTitle }).eq('id', id);
+    const { error } = await supabase.from('photography_albums').update({ title: editAlbumTitle }).eq('id', id);
+    if (error) { toast.error('Erro: ' + error.message); return; }
+    toast.success('Álbum renomeado');
     setEditAlbumId(null);
     fetchAlbums();
   };
 
   const deleteAlbum = async (id: string) => {
-    await supabase.from('photography_albums').delete().eq('id', id);
+    const { error } = await supabase.from('photography_albums').delete().eq('id', id);
+    if (error) { toast.error('Erro: ' + error.message); return; }
+    toast.success('Álbum removido');
     if (selectedAlbum?.id === id) setSelectedAlbum(null);
     fetchAlbums();
   };
@@ -432,20 +457,27 @@ function PhotoManager({ album, onBack }: { album: AlbumItem; onBack: () => void 
 
   const uploadPhotos = async (files: File[]) => {
     setUploading(true);
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      const ext = file.name.split('.').pop();
-      const path = `albums/${album.id}/${Date.now()}-${i}.${ext}`;
-      await supabase.storage.from('media').upload(path, file);
-      const { data: { publicUrl } } = supabase.storage.from('media').getPublicUrl(path);
-      await supabase.from('photography_photos').insert({
-        album_id: album.id,
-        image_url: publicUrl,
-        sort_order: photos.length + i,
-      });
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const ext = file.name.split('.').pop();
+        const path = `albums/${album.id}/${Date.now()}-${i}.${ext}`;
+        const { error: upErr } = await supabase.storage.from('media').upload(path, file);
+        if (upErr) throw upErr;
+        const { data: { publicUrl } } = supabase.storage.from('media').getPublicUrl(path);
+        const { error: insErr } = await supabase.from('photography_photos').insert({
+          album_id: album.id,
+          image_url: publicUrl,
+          sort_order: photos.length + i,
+        });
+        if (insErr) throw insErr;
+      }
+      toast.success(`${files.length} foto(s) enviada(s)`);
+      fetchPhotos();
+    } catch (err: any) {
+      toast.error('Erro ao enviar fotos: ' + (err?.message || 'Erro desconhecido'));
     }
     setUploading(false);
-    fetchPhotos();
   };
 
   const deletePhoto = async (id: string) => {
@@ -512,11 +544,18 @@ function AboutManager() {
 
   const handleSave = async () => {
     setSaving(true);
-    if (id) {
-      await supabase.from('about_content').update({ title, description }).eq('id', id);
-    } else {
-      const { data } = await supabase.from('about_content').insert({ title, description }).select('id').single();
-      if (data) setId(data.id);
+    try {
+      if (id) {
+        const { error } = await supabase.from('about_content').update({ title, description }).eq('id', id);
+        if (error) throw error;
+      } else {
+        const { data, error } = await supabase.from('about_content').insert({ title, description }).select('id').single();
+        if (error) throw error;
+        if (data) setId(data.id);
+      }
+      toast.success('Seção "Sobre" salva');
+    } catch (err: any) {
+      toast.error('Erro: ' + (err?.message || 'Erro desconhecido'));
     }
     setSaving(false);
   };
