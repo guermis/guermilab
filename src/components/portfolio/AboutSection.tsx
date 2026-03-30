@@ -27,21 +27,24 @@ export function AboutSection() {
             </p>
           </div>
           <div className="flex flex-col justify-center gap-6">
-            {STATS.map((stat, i) => (
-              <div
-                key={stat.label}
-                className={`glass rounded-xl p-5 flex items-center gap-5 glass-glow ${isInView ? 'animate-slide-up' : 'opacity-0'}`}
-                style={{ animationDelay: `${400 + i * 200}ms` }}
-              >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent/10">
-                  <stat.icon className="h-5 w-5 text-accent" />
+            {stats.map((stat, i) => {
+              const IconComp = ICON_MAP[stat.icon] || Film;
+              return (
+                <div
+                  key={stat.id}
+                  className={`glass rounded-xl p-5 flex items-center gap-5 glass-glow ${isInView ? 'animate-slide-up' : 'opacity-0'}`}
+                  style={{ animationDelay: `${400 + i * 200}ms` }}
+                >
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent/10">
+                    <IconComp className="h-5 w-5 text-accent" />
+                  </div>
+                  <div>
+                    <div className="font-display text-2xl text-foreground">{stat.value}</div>
+                    <div className="text-xs text-muted-foreground font-body tracking-wide">{stat.label}</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="font-display text-2xl text-foreground">{stat.value}</div>
-                  <div className="text-xs text-muted-foreground font-body tracking-wide">{stat.label}</div>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>

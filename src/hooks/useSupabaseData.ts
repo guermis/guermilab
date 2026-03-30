@@ -95,6 +95,28 @@ export function useAlbumPhotos(albumId: string | null) {
   return { data, loading, refetch: fetch };
 }
 
+export interface AboutStat {
+  id: string;
+  icon: string;
+  label: string;
+  value: string;
+  sort_order: number;
+}
+
+export function useAboutStats() {
+  const [data, setData] = useState<AboutStat[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetch = useCallback(async () => {
+    const { data: rows } = await supabase.from('about_stats').select('*').order('sort_order');
+    if (rows) setData(rows as AboutStat[]);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { fetch(); }, [fetch]);
+  return { data, loading, refetch: fetch };
+}
+
 export function useAboutContent() {
   const [data, setData] = useState<AboutContent | null>(null);
   const [loading, setLoading] = useState(true);
