@@ -258,7 +258,9 @@ function VideoManager({ type }: { type: 'vertical' | 'horizontal' }) {
   };
 
   const handleDelete = async (id: string) => {
-    await supabase.from(table).delete().eq('id', id);
+    const { error } = await supabase.from(table).delete().eq('id', id);
+    if (error) { toast.error('Erro ao deletar: ' + error.message); return; }
+    toast.success('Vídeo removido');
     fetchItems();
   };
 
