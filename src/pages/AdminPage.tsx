@@ -359,19 +359,25 @@ function AlbumManager() {
 
   const createAlbum = async () => {
     if (!newAlbumTitle.trim()) return;
-    await supabase.from('photography_albums').insert({ title: newAlbumTitle.trim(), sort_order: albums.length });
+    const { error } = await supabase.from('photography_albums').insert({ title: newAlbumTitle.trim(), sort_order: albums.length });
+    if (error) { toast.error('Erro ao criar álbum: ' + error.message); return; }
+    toast.success('Álbum criado');
     setNewAlbumTitle('');
     fetchAlbums();
   };
 
   const updateAlbumTitle = async (id: string) => {
-    await supabase.from('photography_albums').update({ title: editAlbumTitle }).eq('id', id);
+    const { error } = await supabase.from('photography_albums').update({ title: editAlbumTitle }).eq('id', id);
+    if (error) { toast.error('Erro: ' + error.message); return; }
+    toast.success('Álbum renomeado');
     setEditAlbumId(null);
     fetchAlbums();
   };
 
   const deleteAlbum = async (id: string) => {
-    await supabase.from('photography_albums').delete().eq('id', id);
+    const { error } = await supabase.from('photography_albums').delete().eq('id', id);
+    if (error) { toast.error('Erro: ' + error.message); return; }
+    toast.success('Álbum removido');
     if (selectedAlbum?.id === id) setSelectedAlbum(null);
     fetchAlbums();
   };
