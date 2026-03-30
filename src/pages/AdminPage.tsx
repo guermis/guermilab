@@ -544,11 +544,18 @@ function AboutManager() {
 
   const handleSave = async () => {
     setSaving(true);
-    if (id) {
-      await supabase.from('about_content').update({ title, description }).eq('id', id);
-    } else {
-      const { data } = await supabase.from('about_content').insert({ title, description }).select('id').single();
-      if (data) setId(data.id);
+    try {
+      if (id) {
+        const { error } = await supabase.from('about_content').update({ title, description }).eq('id', id);
+        if (error) throw error;
+      } else {
+        const { data, error } = await supabase.from('about_content').insert({ title, description }).select('id').single();
+        if (error) throw error;
+        if (data) setId(data.id);
+      }
+      toast.success('Seção "Sobre" salva');
+    } catch (err: any) {
+      toast.error('Erro: ' + (err?.message || 'Erro desconhecido'));
     }
     setSaving(false);
   };
