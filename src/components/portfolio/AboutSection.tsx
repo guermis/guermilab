@@ -1,4 +1,5 @@
 import { useInView } from '@/hooks/useInView';
+import { useAboutContent } from '@/hooks/useSupabaseData';
 import { Camera, Film, Award } from 'lucide-react';
 
 const STATS = [
@@ -9,33 +10,23 @@ const STATS = [
 
 export function AboutSection() {
   const { ref, isInView } = useInView();
+  const { data: about } = useAboutContent();
+
+  const title = about?.title || 'Guermi Lab';
+  const description = about?.description || 'Com mais de uma década de experiência em produção audiovisual, especializo-me em criar narrativas visuais que transcendem o ordinário.';
 
   return (
     <section id="about" className="relative py-20 mt-8">
       <div ref={ref} className="mx-auto max-w-5xl">
         <div className={`grid gap-12 md:grid-cols-2 ${isInView ? 'animate-fade-in' : 'opacity-0'}`}>
-          {/* Text */}
           <div className="glass rounded-2xl p-8 glass-glow">
-            <span className="text-[10px] tracking-[0.3em] uppercase text-accent font-body">
-              Sobre
-            </span>
-            <h2 className="mt-2 font-display text-3xl md:text-4xl text-foreground">
-              Guermi Lab
-            </h2>
+            <span className="text-[10px] tracking-[0.3em] uppercase text-accent font-body">Sobre</span>
+            <h2 className="mt-2 font-display text-3xl md:text-4xl text-foreground">{title}</h2>
             <div className="mt-4 h-[1px] w-16 bg-accent/40" />
-            <p className="mt-6 text-sm leading-relaxed text-muted-foreground font-body">
-              Com mais de uma década de experiência em produção audiovisual,
-              especializo-me em criar narrativas visuais que transcendem o
-              ordinário. Do documentário ao filme publicitário, cada projeto é
-              uma oportunidade de contar uma história única.
-            </p>
-            <p className="mt-4 text-sm leading-relaxed text-muted-foreground font-body">
-              Minha abordagem combina técnica cinematográfica com sensibilidade
-              artística, resultando em imagens que emocionam e inspiram.
+            <p className="mt-6 text-sm leading-relaxed text-muted-foreground font-body whitespace-pre-line">
+              {description}
             </p>
           </div>
-
-          {/* Stats */}
           <div className="flex flex-col justify-center gap-6">
             {STATS.map((stat, i) => (
               <div
