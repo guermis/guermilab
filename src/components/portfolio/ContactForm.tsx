@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Send, Check, Loader2 } from 'lucide-react';
 
-const WHATSAPP_NUMBER = '5511999999999';
+const WHATSAPP_NUMBER = '5512991751413';
 
 const formSchema = z.object({
   name: z.string().trim().min(2, 'Nome muito curto').max(100),
@@ -21,18 +21,15 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 function buildWhatsAppUrl(data: FormData): string {
-  const text = [
-    `*Nova mensagem de contato*`,
+  const lines = [
+    `Olá, meu nome é ${data.name}!`,
+    data.email,
     ``,
-    `*Nome:* ${data.name}`,
-    `*Email:* ${data.email}`,
-    data.project_interest ? `*Interesse:* ${data.project_interest}` : '',
-    ``,
-    `*Mensagem:*`,
+    data.project_interest ? `Tipo de projeto: ${data.project_interest}` : '',
     data.message,
   ].filter(Boolean).join('\n');
 
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines)}`;
 }
 
 export function ContactForm() {

@@ -1,16 +1,15 @@
 import { useInView } from '@/hooks/useInView';
-import { useAboutContent } from '@/hooks/useSupabaseData';
-import { Camera, Film, Award } from 'lucide-react';
+import { useAboutContent, useAboutStats } from '@/hooks/useSupabaseData';
+import { Camera, Film, Award, Star, Heart, Users, Globe, Zap, type LucideIcon } from 'lucide-react';
 
-const STATS = [
-  { icon: Film, label: 'Projetos', value: '40+' },
-  { icon: Camera, label: 'Anos de Experiência', value: '12' },
-  { icon: Award, label: 'Prêmios', value: '8' },
-];
+const ICON_MAP: Record<string, LucideIcon> = {
+  Film, Camera, Award, Star, Heart, Users, Globe, Zap,
+};
 
 export function AboutSection() {
   const { ref, isInView } = useInView();
   const { data: about } = useAboutContent();
+  const { data: stats } = useAboutStats();
 
   const title = about?.title || 'Guermi Lab';
   const description = about?.description || 'Com mais de uma década de experiência em produção audiovisual, especializo-me em criar narrativas visuais que transcendem o ordinário.';
@@ -28,21 +27,24 @@ export function AboutSection() {
             </p>
           </div>
           <div className="flex flex-col justify-center gap-6">
-            {STATS.map((stat, i) => (
-              <div
-                key={stat.label}
-                className={`glass rounded-xl p-5 flex items-center gap-5 glass-glow ${isInView ? 'animate-slide-up' : 'opacity-0'}`}
-                style={{ animationDelay: `${400 + i * 200}ms` }}
-              >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent/10">
-                  <stat.icon className="h-5 w-5 text-accent" />
+            {stats.map((stat, i) => {
+              const IconComp = ICON_MAP[stat.icon] || Film;
+              return (
+                <div
+                  key={stat.id}
+                  className={`glass rounded-xl p-5 flex items-center gap-5 glass-glow ${isInView ? 'animate-slide-up' : 'opacity-0'}`}
+                  style={{ animationDelay: `${400 + i * 200}ms` }}
+                >
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent/10">
+                    <IconComp className="h-5 w-5 text-accent" />
+                  </div>
+                  <div>
+                    <div className="font-display text-2xl text-foreground">{stat.value}</div>
+                    <div className="text-xs text-muted-foreground font-body tracking-wide">{stat.label}</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="font-display text-2xl text-foreground">{stat.value}</div>
-                  <div className="text-xs text-muted-foreground font-body tracking-wide">{stat.label}</div>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>

@@ -530,6 +530,18 @@ function AboutManager() {
   const [id, setId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
+  // Stats
+  const [stats, setStats] = useState<{ id: string; icon: string; label: string; value: string; sort_order: number }[]>([]);
+  const [statForm, setStatForm] = useState({ icon: 'Film', label: '', value: '' });
+  const [editStatId, setEditStatId] = useState<string | null>(null);
+
+  const ICON_OPTIONS = ['Film', 'Camera', 'Award', 'Star', 'Heart', 'Users', 'Globe', 'Zap'];
+
+  const fetchStats = useCallback(async () => {
+    const { data } = await supabase.from('about_stats').select('*').order('sort_order');
+    if (data) setStats(data as any[]);
+  }, []);
+
   useEffect(() => {
     async function load() {
       const { data } = await supabase.from('about_content').select('*').limit(1).maybeSingle();
@@ -540,7 +552,8 @@ function AboutManager() {
       }
     }
     load();
-  }, []);
+    fetchStats();
+  }, [fetchStats]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -560,6 +573,32 @@ function AboutManager() {
     setSaving(false);
   };
 
+  const saveStat = async () => {
+    if (!statForm.label || !statForm.value) return;
+    try {
+      if (editStatId) {
+        const { error } = await supabase.from('about_stats').update({ icon: statForm.icon, label: statForm.label, value: statForm.value }).eq('id', editStatId);
+        if (error) throw error;
+        toast.success('Métrica atualizada');
+      } else {
+        const { error } = await supabase.from('about_stats').insert({ icon: statForm.icon, label: statForm.label, value: statForm.value, sort_order: stats.length });
+        if (error) throw error;
+        toast.success('Métrica adicionada');
+      }
+      setStatForm({ icon: 'Film', label: '', value: '' });
+      setEditStatId(null);
+      fetchStats();
+    } catch (err: any) {
+      toast.error('Erro: ' + (err?.message || 'Erro desconhecido'));
+    }
+  };
+
+  const deleteStat = async (sid: string) => {
+    await supabase.from('about_stats').delete().eq('id', sid);
+    toast.success('Métrica removida');
+    fetchStats();
+  };
+
   return (
     <div className="space-y-6">
       <h2 className="text-foreground text-xl font-semibold">Seção Sobre</h2>
@@ -569,6 +608,44 @@ function AboutManager() {
         <Button onClick={handleSave} disabled={saving} className="rounded-full bg-accent text-accent-foreground hover:bg-accent/90">
           <Check className="h-4 w-4 mr-1" /> {saving ? 'Salvando...' : 'Salvar'}
         </Button>
+      </div>
+
+      {/* Stats / Métricas */}
+      <h3 className="text-foreground text-lg font-semibold">Métricas</h3>
+      <div className="space-y-3">
+        {stats.map(stat => (
+          <div key={stat.id} className="glass rounded-xl p-4 flex items-center gap-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent text-xs font-bold uppercase">{stat.icon}</div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-foreground font-medium">{stat.value} — {stat.label}</p>
+            </div>
+            <div className="flex gap-2 shrink-0">
+              <button onClick={() => { setEditStatId(stat.id); setStatForm({ icon: stat.icon, label: stat.label, value: stat.value }); }} className="text-muted-foreground hover:text-foreground transition-colors"><Edit2 className="h-4 w-4" /></button>
+              <button onClick={() => deleteStat(stat.id)} className="text-muted-foreground hover:text-destructive transition-colors"><Trash2 className="h-4 w-4" /></button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="glass rounded-xl p-5 space-y-3">
+        <h4 className="text-sm text-foreground font-medium">{editStatId ? 'Editar métrica' : 'Adicionar métrica'}</h4>
+        <div className="grid grid-cols-3 gap-3">
+          <select value={statForm.icon} onChange={e => setStatForm(p => ({ ...p, icon: e.target.value }))} className="bg-secondary/50 border border-border rounded-md px-3 py-2 text-sm text-foreground">
+            {ICON_OPTIONS.map(ic => <option key={ic} value={ic}>{ic}</option>)}
+          </select>
+          <Input placeholder="Valor (ex: 40+)" value={statForm.value} onChange={e => setStatForm(p => ({ ...p, value: e.target.value }))} className="bg-secondary/50 border-border" />
+          <Input placeholder="Label (ex: Projetos)" value={statForm.label} onChange={e => setStatForm(p => ({ ...p, label: e.target.value }))} className="bg-secondary/50 border-border" />
+        </div>
+        <div className="flex gap-2">
+          <Button onClick={saveStat} disabled={!statForm.label || !statForm.value} className="rounded-full bg-accent text-accent-foreground hover:bg-accent/90">
+            <Check className="h-4 w-4 mr-1" /> {editStatId ? 'Salvar' : 'Adicionar'}
+          </Button>
+          {editStatId && (
+            <Button variant="outline" onClick={() => { setEditStatId(null); setStatForm({ icon: 'Film', label: '', value: '' }); }} className="rounded-full">
+              <X className="h-4 w-4 mr-1" /> Cancelar
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );
