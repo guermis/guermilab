@@ -457,20 +457,27 @@ function PhotoManager({ album, onBack }: { album: AlbumItem; onBack: () => void 
 
   const uploadPhotos = async (files: File[]) => {
     setUploading(true);
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      const ext = file.name.split('.').pop();
-      const path = `albums/${album.id}/${Date.now()}-${i}.${ext}`;
-      await supabase.storage.from('media').upload(path, file);
-      const { data: { publicUrl } } = supabase.storage.from('media').getPublicUrl(path);
-      await supabase.from('photography_photos').insert({
-        album_id: album.id,
-        image_url: publicUrl,
-        sort_order: photos.length + i,
-      });
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const ext = file.name.split('.').pop();
+        const path = `albums/${album.id}/${Date.now()}-${i}.${ext}`;
+        const { error: upErr } = await supabase.storage.from('media').upload(path, file);
+        if (upErr) throw upErr;
+        const { data: { publicUrl } } = supabase.storage.from('media').getPublicUrl(path);
+        const { error: insErr } = await supabase.from('photography_photos').insert({
+          album_id: album.id,
+          image_url: publicUrl,
+          sort_order: photos.length + i,
+        });
+        if (insErr) throw insErr;
+      }
+      toast.success(`${files.length} foto(s) enviada(s)`);
+      fetchPhotos();
+    } catch (err: any) {
+      toast.error('Erro ao enviar fotos: ' + (err?.message || 'Erro desconhecido'));
     }
     setUploading(false);
-    fetchPhotos();
   };
 
   const deletePhoto = async (id: string) => {
