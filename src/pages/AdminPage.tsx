@@ -137,14 +137,20 @@ function HeroManager() {
 
   const handleUpload = async (file: File) => {
     setUploading(true);
-    const ext = file.name.split('.').pop();
-    const path = `hero/${Date.now()}.${ext}`;
-    const { error: uploadError } = await supabase.storage.from('media').upload(path, file);
-    if (uploadError) { setUploading(false); return; }
-    const { data: { publicUrl } } = supabase.storage.from('media').getPublicUrl(path);
-    await supabase.from('hero_images').insert({ image_url: publicUrl, sort_order: images.length });
+    try {
+      const ext = file.name.split('.').pop();
+      const path = `hero/${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from('media').upload(path, file);
+      if (uploadError) throw uploadError;
+      const { data: { publicUrl } } = supabase.storage.from('media').getPublicUrl(path);
+      const { error: insertError } = await supabase.from('hero_images').insert({ image_url: publicUrl, sort_order: images.length });
+      if (insertError) throw insertError;
+      toast.success('Imagem hero enviada com sucesso');
+      fetchImages();
+    } catch (err: any) {
+      toast.error('Erro ao enviar imagem: ' + (err?.message || 'Erro desconhecido'));
+    }
     setUploading(false);
-    fetchImages();
   };
 
   const handleDelete = async (id: string) => {
