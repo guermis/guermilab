@@ -214,28 +214,36 @@ function VideoManager({ type }: { type: 'vertical' | 'horizontal' }) {
 
   const handleSave = async () => {
     setUploading(true);
-    if (editId) {
-      await supabase.from(table).update({
-        title: form.title,
-        client: form.client || null,
-        duration: form.duration || null,
-        video_url: form.video_url || null,
-        thumbnail_url: form.thumbnail_url || null,
-      }).eq('id', editId);
-    } else {
-      await supabase.from(table).insert({
-        title: form.title,
-        client: form.client || null,
-        duration: form.duration || null,
-        video_url: form.video_url || null,
-        thumbnail_url: form.thumbnail_url || null,
-        sort_order: items.length,
-      });
+    try {
+      if (editId) {
+        const { error } = await supabase.from(table).update({
+          title: form.title,
+          client: form.client || null,
+          duration: form.duration || null,
+          video_url: form.video_url || null,
+          thumbnail_url: form.thumbnail_url || null,
+        }).eq('id', editId);
+        if (error) throw error;
+        toast.success('Vídeo atualizado');
+      } else {
+        const { error } = await supabase.from(table).insert({
+          title: form.title,
+          client: form.client || null,
+          duration: form.duration || null,
+          video_url: form.video_url || null,
+          thumbnail_url: form.thumbnail_url || null,
+          sort_order: items.length,
+        });
+        if (error) throw error;
+        toast.success('Vídeo adicionado');
+      }
+      setForm({ title: '', client: '', duration: '', video_url: '', thumbnail_url: '' });
+      setEditId(null);
+      fetchItems();
+    } catch (err: any) {
+      toast.error('Erro: ' + (err?.message || 'Erro desconhecido'));
     }
-    setForm({ title: '', client: '', duration: '', video_url: '', thumbnail_url: '' });
-    setEditId(null);
     setUploading(false);
-    fetchItems();
   };
 
   const handleEdit = (item: VideoItem) => {
