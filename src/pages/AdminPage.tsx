@@ -10,9 +10,6 @@ import {
   Upload, Plus, Trash2, GripVertical, Edit2, Check, X, FileText
 } from 'lucide-react';
 
-const ADMIN_USER = 'admin';
-const ADMIN_PASS = 'guermilab2024';
-
 type Tab = 'hero' | 'vertical' | 'horizontal' | 'fotografia' | 'sobre';
 
 interface VideoItem {
@@ -41,21 +38,49 @@ interface PhotoItem {
 
 export default function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loginUser, setLoginUser] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [loginEmail, setLoginEmail] = useState('');
   const [loginPass, setLoginPass] = useState('');
   const [loginError, setLoginError] = useState('');
   const [activeTab, setActiveTab] = useState<Tab>('hero');
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session);
+      setIsLoading(false);
+    });
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session);
+      setIsLoading(false);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (loginUser === ADMIN_USER && loginPass === ADMIN_PASS) {
-      setIsLoggedIn(true);
-      setLoginError('');
-    } else {
-      setLoginError('Credenciais inválidas');
+    setLoginError('');
+    const { error } = await supabase.auth.signInWithPassword({
+      email: loginEmail,
+      password: loginPass,
+    });
+    if (error) {
+      setLoginError(error.message);
     }
   };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setIsLoggedIn(false);
+  };
+
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Carregando...</p>
+      </main>
+    );
+  }
 
   if (!isLoggedIn) {
     return (
@@ -63,7 +88,7 @@ export default function AdminPage() {
         <div className="glass rounded-2xl p-8 w-full max-w-sm glass-glow">
           <h1 className="text-foreground text-xl font-semibold mb-6 text-center">Guermi Lab Admin</h1>
           <form onSubmit={handleLogin} className="space-y-4">
-            <Input placeholder="Usuário" value={loginUser} onChange={e => setLoginUser(e.target.value)} className="bg-secondary/50 border-border" />
+            <Input placeholder="E-mail" type="email" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} className="bg-secondary/50 border-border" />
             <Input type="password" placeholder="Senha" value={loginPass} onChange={e => setLoginPass(e.target.value)} className="bg-secondary/50 border-border" />
             {loginError && <p className="text-destructive text-xs">{loginError}</p>}
             <Button type="submit" className="w-full rounded-full bg-accent text-accent-foreground hover:bg-accent/90">Entrar</Button>
@@ -91,7 +116,7 @@ export default function AdminPage() {
           <span className="text-muted-foreground/30">|</span>
           <span className="font-display text-sm tracking-widest text-foreground uppercase">Guermi Lab Admin</span>
         </div>
-        <button onClick={() => setIsLoggedIn(false)} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors">
+        <button onClick={handleLogout} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors">
           <LogOut className="h-4 w-4" /> Sair
         </button>
       </header>
