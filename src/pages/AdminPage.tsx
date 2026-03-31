@@ -74,13 +74,21 @@ export default function AdminPage() {
     setIsLoggedIn(false);
   };
 
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Carregando...</p>
+      </main>
+    );
+  }
+
   if (!isLoggedIn) {
     return (
       <main className="min-h-screen bg-background flex items-center justify-center">
         <div className="glass rounded-2xl p-8 w-full max-w-sm glass-glow">
           <h1 className="text-foreground text-xl font-semibold mb-6 text-center">Guermi Lab Admin</h1>
           <form onSubmit={handleLogin} className="space-y-4">
-            <Input placeholder="Usuário" value={loginUser} onChange={e => setLoginUser(e.target.value)} className="bg-secondary/50 border-border" />
+            <Input placeholder="E-mail" type="email" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} className="bg-secondary/50 border-border" />
             <Input type="password" placeholder="Senha" value={loginPass} onChange={e => setLoginPass(e.target.value)} className="bg-secondary/50 border-border" />
             {loginError && <p className="text-destructive text-xs">{loginError}</p>}
             <Button type="submit" className="w-full rounded-full bg-accent text-accent-foreground hover:bg-accent/90">Entrar</Button>
