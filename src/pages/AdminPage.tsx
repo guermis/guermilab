@@ -10,9 +10,6 @@ import {
   Upload, Plus, Trash2, GripVertical, Edit2, Check, X, FileText
 } from 'lucide-react';
 
-const ADMIN_USER = 'admin';
-const ADMIN_PASS = 'guermilab2024';
-
 type Tab = 'hero' | 'vertical' | 'horizontal' | 'fotografia' | 'sobre';
 
 interface VideoItem {
@@ -41,20 +38,40 @@ interface PhotoItem {
 
 export default function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loginUser, setLoginUser] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [loginEmail, setLoginEmail] = useState('');
   const [loginPass, setLoginPass] = useState('');
   const [loginError, setLoginError] = useState('');
   const [activeTab, setActiveTab] = useState<Tab>('hero');
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session);
+      setIsLoading(false);
+    });
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session);
+      setIsLoading(false);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (loginUser === ADMIN_USER && loginPass === ADMIN_PASS) {
-      setIsLoggedIn(true);
-      setLoginError('');
-    } else {
-      setLoginError('Credenciais inválidas');
+    setLoginError('');
+    const { error } = await supabase.auth.signInWithPassword({
+      email: loginEmail,
+      password: loginPass,
+    });
+    if (error) {
+      setLoginError(error.message);
     }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setIsLoggedIn(false);
   };
 
   if (!isLoggedIn) {
