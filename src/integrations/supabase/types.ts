@@ -98,6 +98,13 @@ export type Database = {
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "ai_suggestions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       analytics_events: {
@@ -218,6 +225,13 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_blocks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects_public"
             referencedColumns: ["id"]
           },
         ]
@@ -562,7 +576,84 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      projects_public: {
+        Row: {
+          category: string | null
+          client_name: string | null
+          context: string | null
+          created_at: string | null
+          director_notes: Json | null
+          duration: string | null
+          execution: string | null
+          hero_image_url: string | null
+          id: string | null
+          is_private: boolean | null
+          is_published: boolean | null
+          long_description: string | null
+          main_video_url: string | null
+          result: string | null
+          role_title: string | null
+          short_description: string | null
+          slug: string | null
+          sort_order: number | null
+          tags: string[] | null
+          thumbnail_url: string | null
+          title: string | null
+          updated_at: string | null
+          year: string | null
+        }
+        Insert: {
+          category?: string | null
+          client_name?: string | null
+          context?: string | null
+          created_at?: string | null
+          director_notes?: Json | null
+          duration?: string | null
+          execution?: string | null
+          hero_image_url?: string | null
+          id?: string | null
+          is_private?: boolean | null
+          is_published?: boolean | null
+          long_description?: string | null
+          main_video_url?: string | null
+          result?: string | null
+          role_title?: string | null
+          short_description?: string | null
+          slug?: string | null
+          sort_order?: number | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title?: string | null
+          updated_at?: string | null
+          year?: string | null
+        }
+        Update: {
+          category?: string | null
+          client_name?: string | null
+          context?: string | null
+          created_at?: string | null
+          director_notes?: Json | null
+          duration?: string | null
+          execution?: string | null
+          hero_image_url?: string | null
+          id?: string | null
+          is_private?: boolean | null
+          is_published?: boolean | null
+          long_description?: string | null
+          main_video_url?: string | null
+          result?: string | null
+          role_title?: string | null
+          short_description?: string | null
+          slug?: string | null
+          sort_order?: number | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title?: string | null
+          updated_at?: string | null
+          year?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
