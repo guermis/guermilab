@@ -116,7 +116,7 @@ export default function AdminPage() {
           <span className="text-muted-foreground/30">|</span>
           <span className="font-display text-sm tracking-widest text-foreground uppercase">Guermi Lab Admin</span>
         </div>
-        <button onClick={() => setIsLoggedIn(false)} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors">
+        <button onClick={handleLogout} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors">
           <LogOut className="h-4 w-4" /> Sair
         </button>
       </header>
