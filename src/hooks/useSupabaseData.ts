@@ -1,132 +1,115 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import type {
+  HeroImageItem,
+  VideoItem,
+  AlbumItem,
+  PhotoItem,
+  AboutContentItem,
+  AboutStatItem,
+} from '@/types/models';
 
-export interface HeroImage {
-  id: string;
-  image_url: string;
-  sort_order: number;
-}
+// Re-export legacy aliases for backwards compatibility
+export type HeroImage = HeroImageItem;
+export type { VideoItem, AboutStatItem as AboutStat } from '@/types/models';
+export type Album = AlbumItem;
+export type AlbumPhoto = PhotoItem;
+export type AboutContent = AboutContentItem;
 
-export interface VideoItem {
-  id: string;
-  title: string;
-  client: string | null;
-  duration: string | null;
-  video_url: string | null;
-  thumbnail_url: string | null;
-  sort_order: number;
-}
-
-export interface Album {
-  id: string;
-  title: string;
-  cover_image_url: string | null;
-  sort_order: number;
-}
-
-export interface AlbumPhoto {
-  id: string;
-  album_id: string;
-  image_url: string;
-  sort_order: number;
-}
-
-export interface AboutContent {
-  id: string;
-  title: string;
-  description: string;
-}
+const STALE_TIME = 1000 * 60; // 1 min
 
 export function useHeroImages() {
-  const [data, setData] = useState<HeroImage[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    const { data: rows } = await supabase.from('hero_images').select('*').order('sort_order');
-    if (rows) setData(rows);
-    setLoading(false);
-  }, []);
-
-  useEffect(() => { fetch(); }, [fetch]);
-  return { data, loading, refetch: fetch };
+  const query = useQuery({
+    queryKey: ['hero_images'],
+    staleTime: STALE_TIME,
+    queryFn: async (): Promise<HeroImageItem[]> => {
+      const { data, error } = await supabase.from('hero_images').select('*').order('sort_order');
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  return { data: query.data ?? [], loading: query.isLoading, refetch: query.refetch };
 }
 
 export function useVideos(type: 'vertical' | 'horizontal') {
-  const [data, setData] = useState<VideoItem[]>([]);
-  const [loading, setLoading] = useState(true);
   const table = type === 'vertical' ? 'videos_vertical' : 'videos_horizontal';
-
-  const fetch = useCallback(async () => {
-    const { data: rows } = await supabase.from(table).select('*').order('sort_order');
-    if (rows) setData(rows as VideoItem[]);
-    setLoading(false);
-  }, [table]);
-
-  useEffect(() => { fetch(); }, [fetch]);
-  return { data, loading, refetch: fetch };
+  const query = useQuery({
+    queryKey: ['videos', type],
+    staleTime: STALE_TIME,
+    queryFn: async (): Promise<VideoItem[]> => {
+      const { data, error } = await supabase.from(table).select('*').order('sort_order');
+      if (error) throw error;
+      return (data ?? []) as VideoItem[];
+    },
+  });
+  return { data: query.data ?? [], loading: query.isLoading, refetch: query.refetch };
 }
 
 export function useAlbums() {
-  const [data, setData] = useState<Album[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    const { data: rows } = await supabase.from('photography_albums').select('*').order('sort_order');
-    if (rows) setData(rows);
-    setLoading(false);
-  }, []);
-
-  useEffect(() => { fetch(); }, [fetch]);
-  return { data, loading, refetch: fetch };
+  const query = useQuery({
+    queryKey: ['photography_albums'],
+    staleTime: STALE_TIME,
+    queryFn: async (): Promise<AlbumItem[]> => {
+      const { data, error } = await supabase
+        .from('photography_albums')
+        .select('*')
+        .order('sort_order');
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  return { data: query.data ?? [], loading: query.isLoading, refetch: query.refetch };
 }
 
 export function useAlbumPhotos(albumId: string | null) {
-  const [data, setData] = useState<AlbumPhoto[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    if (!albumId) { setData([]); setLoading(false); return; }
-    const { data: rows } = await supabase.from('photography_photos').select('*').eq('album_id', albumId).order('sort_order');
-    if (rows) setData(rows);
-    setLoading(false);
-  }, [albumId]);
-
-  useEffect(() => { fetch(); }, [fetch]);
-  return { data, loading, refetch: fetch };
-}
-
-export interface AboutStat {
-  id: string;
-  icon: string;
-  label: string;
-  value: string;
-  sort_order: number;
+  const query = useQuery({
+    queryKey: ['photography_photos', albumId],
+    enabled: !!albumId,
+    staleTime: STALE_TIME,
+    queryFn: async (): Promise<PhotoItem[]> => {
+      if (!albumId) return [];
+      const { data, error } = await supabase
+        .from('photography_photos')
+        .select('*')
+        .eq('album_id', albumId)
+        .order('sort_order');
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  return {
+    data: query.data ?? [],
+    loading: albumId ? query.isLoading : false,
+    refetch: query.refetch,
+  };
 }
 
 export function useAboutStats() {
-  const [data, setData] = useState<AboutStat[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    const { data: rows } = await supabase.from('about_stats').select('*').order('sort_order');
-    if (rows) setData(rows as AboutStat[]);
-    setLoading(false);
-  }, []);
-
-  useEffect(() => { fetch(); }, [fetch]);
-  return { data, loading, refetch: fetch };
+  const query = useQuery({
+    queryKey: ['about_stats'],
+    staleTime: STALE_TIME,
+    queryFn: async (): Promise<AboutStatItem[]> => {
+      const { data, error } = await supabase.from('about_stats').select('*').order('sort_order');
+      if (error) throw error;
+      return (data ?? []) as AboutStatItem[];
+    },
+  });
+  return { data: query.data ?? [], loading: query.isLoading, refetch: query.refetch };
 }
 
 export function useAboutContent() {
-  const [data, setData] = useState<AboutContent | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    const { data: row } = await supabase.from('about_content').select('*').limit(1).maybeSingle();
-    if (row) setData(row);
-    setLoading(false);
-  }, []);
-
-  useEffect(() => { fetch(); }, [fetch]);
-  return { data, loading, refetch: fetch };
+  const query = useQuery({
+    queryKey: ['about_content'],
+    staleTime: STALE_TIME,
+    queryFn: async (): Promise<AboutContentItem | null> => {
+      const { data, error } = await supabase
+        .from('about_content')
+        .select('*')
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+  return { data: query.data ?? null, loading: query.isLoading, refetch: query.refetch };
 }

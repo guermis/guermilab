@@ -2,12 +2,11 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
-import { Send, Check, Loader2 } from 'lucide-react';
+import { Send, Check } from 'lucide-react';
 
 const WHATSAPP_NUMBER = '5512991751413';
 
@@ -33,50 +32,35 @@ function buildWhatsAppUrl(data: FormData): string {
 }
 
 export function ContactForm() {
-  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [sent, setSent] = useState(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: { name: '', email: '', project_interest: '', message: '' },
   });
 
-  const onSubmit = async (data: FormData) => {
-    setStatus('sending');
-    try {
-      // Save to database
-      const { error } = await supabase.from('contact_submissions').insert([{
-        name: data.name,
-        email: data.email,
-        project_interest: data.project_interest || null,
-        message: data.message,
-        source: 'whatsapp_form',
-        metadata: {
-          page: window.location.pathname,
-          referrer: document.referrer || null,
-          timestamp: new Date().toISOString(),
-        },
-      }]);
-      if (error) throw error;
-
-      // Open WhatsApp with formatted message
-      const whatsappUrl = buildWhatsAppUrl(data);
-      window.open(whatsappUrl, '_blank');
-
-      setStatus('sent');
-      form.reset();
-    } catch {
-      setStatus('error');
-    }
+  const onSubmit = (data: FormData) => {
+    const url = buildWhatsAppUrl(data);
+    window.open(url, '_blank');
+    setSent(true);
+    form.reset();
   };
 
-  if (status === 'sent') {
+  if (sent) {
     return (
       <div className="flex flex-col items-center gap-3 py-8 text-center">
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 border border-accent/30">
           <Check className="h-5 w-5 text-accent" />
         </div>
-        <p className="text-sm text-foreground font-body">Mensagem enviada com sucesso!</p>
-        <p className="text-xs text-muted-foreground font-body">Retornarei em breve.</p>
+        <p className="text-sm text-foreground font-body">Mensagem aberta no WhatsApp!</p>
+        <p className="text-xs text-muted-foreground font-body">Conclua o envio diretamente por lá.</p>
+        <Button
+          variant="outline"
+          onClick={() => setSent(false)}
+          className="mt-2 rounded-full text-xs tracking-[0.15em] uppercase"
+        >
+          Enviar outra mensagem
+        </Button>
       </div>
     );
   }
@@ -155,23 +139,12 @@ export function ContactForm() {
           )}
         />
 
-        {status === 'error' && (
-          <p className="text-xs text-destructive font-body">Erro ao enviar. Tente novamente.</p>
-        )}
-
         <Button
           type="submit"
-          disabled={status === 'sending'}
           className="w-full rounded-full text-xs tracking-[0.15em] uppercase bg-accent text-accent-foreground hover:bg-accent/90"
         >
-          {status === 'sending' ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <>
-              <Send className="h-3.5 w-3.5" />
-              Enviar mensagem
-            </>
-          )}
+          <Send className="h-3.5 w-3.5" />
+          Enviar mensagem
         </Button>
       </form>
     </Form>
