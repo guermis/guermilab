@@ -39,13 +39,22 @@ export function ContactForm() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+    // Formata a mensagem com as quebras de linha corretas
     const text = `Olá, meu nome é ${values.name}!\n${values.email}\nTipo de projeto: ${values.projectType}\n${values.message}`;
     const encodedText = encodeURIComponent(text);
     
-    // URL limpa e direta da API universal do WhatsApp
-    const url = `https://wa.me/5512991751413?text=${encodedText}`;
+    // Tenta usar o Deep Link nativo primeiro (excelente para celular)
+    const deepLink = `whatsapp://send?phone=5512991751413&text=${encodedText}`;
     
-    window.open(url, '_blank');
+    // Se for computador, vai direto para o WhatsApp Web (sem passar pela API bugada da Meta)
+    const webLink = `https://web.whatsapp.com/send?phone=5512991751413&text=${encodedText}`;
+
+    // Detecta se é mobile (celular/tablet) para escolher a melhor rota
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const finalUrl = isMobile ? deepLink : webLink;
+    
+    // Abre a janela imediatamente
+    window.open(finalUrl, '_blank');
   }
 
   return (
