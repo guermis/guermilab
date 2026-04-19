@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import type {
   HeroImageItem,
@@ -18,6 +20,12 @@ export type AboutContent = AboutContentItem;
 
 const STALE_TIME = 1000 * 60; // 1 min
 
+function useErrorToast(isError: boolean, label: string) {
+  useEffect(() => {
+    if (isError) toast.error(`Não foi possível carregar ${label}.`);
+  }, [isError, label]);
+}
+
 export function useHeroImages() {
   const query = useQuery({
     queryKey: ['hero_images'],
@@ -28,6 +36,7 @@ export function useHeroImages() {
       return data ?? [];
     },
   });
+  useErrorToast(query.isError, 'as imagens do hero');
   return { data: query.data ?? [], loading: query.isLoading, refetch: query.refetch };
 }
 
@@ -42,6 +51,7 @@ export function useVideos(type: 'vertical' | 'horizontal') {
       return (data ?? []) as VideoItem[];
     },
   });
+  useErrorToast(query.isError, `os vídeos ${type === 'vertical' ? 'verticais' : 'horizontais'}`);
   return { data: query.data ?? [], loading: query.isLoading, refetch: query.refetch };
 }
 
@@ -58,6 +68,7 @@ export function useAlbums() {
       return data ?? [];
     },
   });
+  useErrorToast(query.isError, 'os álbuns');
   return { data: query.data ?? [], loading: query.isLoading, refetch: query.refetch };
 }
 
@@ -77,6 +88,7 @@ export function useAlbumPhotos(albumId: string | null) {
       return data ?? [];
     },
   });
+  useErrorToast(query.isError, 'as fotos do álbum');
   return {
     data: query.data ?? [],
     loading: albumId ? query.isLoading : false,
@@ -94,6 +106,7 @@ export function useAboutStats() {
       return (data ?? []) as AboutStatItem[];
     },
   });
+  useErrorToast(query.isError, 'as métricas');
   return { data: query.data ?? [], loading: query.isLoading, refetch: query.refetch };
 }
 
@@ -111,5 +124,6 @@ export function useAboutContent() {
       return data;
     },
   });
+  useErrorToast(query.isError, 'o conteúdo da seção sobre');
   return { data: query.data ?? null, loading: query.isLoading, refetch: query.refetch };
 }
