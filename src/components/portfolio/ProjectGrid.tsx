@@ -1,7 +1,6 @@
 import { useVideos, useAlbums } from '@/hooks/useSupabaseData';
 import { StreamingRow } from './StreamingRow';
 import type { VideoItem, Album } from '@/hooks/useSupabaseData';
-import { PROJECTS } from '@/data/projects';
 import type { Project } from '@/types/project';
 
 interface ProjectGridProps {
@@ -11,7 +10,7 @@ interface ProjectGridProps {
 }
 
 function videosToProjects(videos: VideoItem[], type: 'vertical' | 'horizontal'): Project[] {
-  return videos.map((v, i) => ({
+  return videos.map((v) => ({
     id: v.id,
     slug: v.id,
     title: v.title,
@@ -51,42 +50,37 @@ function albumsToProjects(albums: Album[]): Project[] {
   }));
 }
 
-// Pad with duplicates for carousel testing
-function padItems<T extends { id: string }>(items: T[], min: number): T[] {
-  if (items.length === 0) return [];
-  const result = [...items];
-  let idx = 0;
-  while (result.length < min) {
-    result.push({ ...items[idx % items.length], id: `${items[idx % items.length].id}-dup-${result.length}` });
-    idx++;
-  }
-  return result;
-}
-
 export function ProjectGrid({ activeCategory = null, onVideoClick, onAlbumClick }: ProjectGridProps) {
   const { data: verticalVideos } = useVideos('vertical');
   const { data: horizontalVideos } = useVideos('horizontal');
   const { data: albums } = useAlbums();
 
-  // Use DB data, fallback to hardcoded for demo
-  const verticalProjects = verticalVideos.length > 0
-    ? videosToProjects(verticalVideos, 'vertical')
-    : PROJECTS.filter((_, i) => i % 3 === 0).map(p => ({ ...p, category: 'Vertical' }));
-
-  const horizontalProjects = horizontalVideos.length > 0
-    ? videosToProjects(horizontalVideos, 'horizontal')
-    : PROJECTS.filter((_, i) => i % 3 === 1).map(p => ({ ...p, category: 'Horizontal' }));
-
-  const albumProjects = albums.length > 0
-    ? albumsToProjects(albums)
-    : PROJECTS.filter((_, i) => i % 3 === 2).map(p => ({ ...p, category: 'Fotografia' }));
-
+  // Only render real DB data — no fallbacks, no duplicate padding.
   const sections = [
-    { key: 'vertical', title: 'Vertical', aspect: '9:16' as const, projects: padItems(verticalProjects, 8), isPhotography: false },
-    { key: 'horizontal', title: 'Horizontal', aspect: '16:9' as const, projects: padItems(horizontalProjects, 8), isPhotography: false },
-    { key: 'fotografia', title: 'Fotografia', aspect: '3:4' as const, projects: padItems(albumProjects, 8), isPhotography: true },
+    {
+      key: 'vertical',
+      title: 'Vertical',
+      aspect: '9:16' as const,
+      projects: videosToProjects(verticalVideos, 'vertical'),
+      isPhotography: false,
+    },
+    {
+      key: 'horizontal',
+      title: 'Horizontal',
+      aspect: '16:9' as const,
+      projects: videosToProjects(horizontalVideos, 'horizontal'),
+      isPhotography: false,
+    },
+    {
+      key: 'fotografia',
+      title: 'Fotografia',
+      aspect: '3:4' as const,
+      projects: albumsToProjects(albums),
+      isPhotography: true,
+    },
   ];
 
+  // Hide empty sections entirely (no empty rows / streaming panels).
   const filtered = activeCategory
     ? sections.filter(s => s.title === activeCategory)
     : sections;
@@ -95,9 +89,9 @@ export function ProjectGrid({ activeCategory = null, onVideoClick, onAlbumClick 
 
   if (visible.length === 0) {
     return (
-      <div className="py-24 text-center">
-        <p className="text-sm text-muted-foreground">Nenhum projeto encontrado.</p>
-      </div>
+      <section id="work" className="py-24 text-center">
+        <p className="text-sm text-muted-foreground">Nenhum projeto disponível ainda.</p>
+      </section>
     );
   }
 
@@ -112,9 +106,8 @@ export function ProjectGrid({ activeCategory = null, onVideoClick, onAlbumClick 
           isPhotography={isPhotography}
           onCardClick={(project) => {
             if (isPhotography && onAlbumClick) {
-              const album = albums.find(a => a.id === project.id) || 
-                { id: project.id, title: project.title, cover_image_url: project.thumbnail, sort_order: 0 };
-              onAlbumClick(album);
+              const album = albums.find(a => a.id === project.id);
+              if (album) onAlbumClick(album);
             } else if (onVideoClick) {
               onVideoClick(project);
             }

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
@@ -13,6 +14,7 @@ interface Props {
 const EMPTY_FORM = { title: '', client: '', duration: '', video_url: '', thumbnail_url: '' };
 
 export function VideoManager({ type }: Props) {
+  const qc = useQueryClient();
   const table = type === 'vertical' ? 'videos_vertical' : 'videos_horizontal';
   const [items, setItems] = useState<VideoItem[]>([]);
   const [editId, setEditId] = useState<string | null>(null);
@@ -22,7 +24,8 @@ export function VideoManager({ type }: Props) {
   const fetchItems = useCallback(async () => {
     const { data } = await supabase.from(table).select('*').order('sort_order');
     if (data) setItems(data as VideoItem[]);
-  }, [table]);
+    qc.invalidateQueries({ queryKey: ['videos', type] });
+  }, [table, qc, type]);
 
   useEffect(() => { fetchItems(); }, [fetchItems]);
 
