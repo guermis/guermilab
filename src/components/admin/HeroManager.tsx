@@ -5,14 +5,17 @@ import { toast } from 'sonner';
 import { Trash2, Upload } from 'lucide-react';
 import type { HeroImageItem } from '@/types/models';
 
+type Variant = 'horizontal' | 'vertical';
+
 /**
- * Hero singleton manager: only ONE hero image exists at a time.
- * Uploading a new one atomically replaces the previous (DB row + storage object).
+ * Hero singleton manager: a single row holds BOTH the horizontal (16:9)
+ * and vertical (4:3) hero images. Each upload atomically replaces its
+ * variant (DB column + storage object).
  */
 export function HeroManager() {
   const qc = useQueryClient();
   const [current, setCurrent] = useState<HeroImageItem | null>(null);
-  const [uploading, setUploading] = useState(false);
+  const [uploading, setUploading] = useState<Variant | null>(null);
 
   const fetchCurrent = useCallback(async () => {
     const { data } = await supabase
@@ -21,22 +24,25 @@ export function HeroManager() {
       .order('sort_order')
       .limit(1)
       .maybeSingle();
-    setCurrent(data ?? null);
+    setCurrent((data as HeroImageItem) ?? null);
   }, []);
 
   useEffect(() => { fetchCurrent(); }, [fetchCurrent]);
 
-  const extractStoragePath = (publicUrl: string): string | null => {
+  const extractStoragePath = (publicUrl: string | null): string | null => {
+    if (!publicUrl) return null;
     const marker = '/storage/v1/object/public/media/';
     const idx = publicUrl.indexOf(marker);
     return idx === -1 ? null : publicUrl.substring(idx + marker.length);
   };
 
-  const handleUpload = async (file: File) => {
-    setUploading(true);
+  const invalidate = () => qc.invalidateQueries({ queryKey: ['hero_images'] });
+
+  const handleUpload = async (file: File, variant: Variant) => {
+    setUploading(variant);
     try {
       const ext = file.name.split('.').pop();
-      const path = `hero/${Date.now()}.${ext}`;
+      const path = `hero/${variant}-${Date.now()}.${ext}`;
 
       const { error: uploadError } = await supabase.storage
         .from('media')
@@ -45,61 +51,85 @@ export function HeroManager() {
 
       const { data: { publicUrl } } = supabase.storage.from('media').getPublicUrl(path);
 
-      // Snapshot of previous state to delete after the new one is committed
       const previous = current;
+      const column = variant === 'horizontal' ? 'image_url' : 'image_url_vertical';
 
       if (previous) {
-        // Atomically swap by updating the existing row (no flicker)
         const { error: updateError } = await supabase
           .from('hero_images')
-          .update({ image_url: publicUrl, updated_at: new Date().toISOString() })
+          .update({ [column]: publicUrl, updated_at: new Date().toISOString() })
           .eq('id', previous.id);
         if (updateError) throw updateError;
 
-        const oldPath = extractStoragePath(previous.image_url);
+        const oldUrl = variant === 'horizontal' ? previous.image_url : previous.image_url_vertical;
+        const oldPath = extractStoragePath(oldUrl);
         if (oldPath) await supabase.storage.from('media').remove([oldPath]);
       } else {
+        // First-ever insert: image_url is NOT NULL in DB, so seed it.
+        const insertPayload = variant === 'horizontal'
+          ? { image_url: publicUrl, image_url_vertical: null, sort_order: 0 }
+          : { image_url: publicUrl, image_url_vertical: publicUrl, sort_order: 0 };
         const { error: insertError } = await supabase
           .from('hero_images')
-          .insert({ image_url: publicUrl, sort_order: 0 });
+          .insert(insertPayload);
         if (insertError) throw insertError;
       }
 
-      toast.success('Imagem hero atualizada');
+      toast.success(`Hero ${variant === 'horizontal' ? '16:9' : '4:3'} atualizada`);
       await fetchCurrent();
-      qc.invalidateQueries({ queryKey: ['hero_images'] });
+      invalidate();
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Erro desconhecido';
       toast.error('Erro ao enviar imagem: ' + msg);
     }
-    setUploading(false);
+    setUploading(null);
   };
 
-  const handleDelete = async () => {
+  const handleDelete = async (variant: Variant) => {
     if (!current) return;
-    const oldPath = extractStoragePath(current.image_url);
-    const { error } = await supabase.from('hero_images').delete().eq('id', current.id);
-    if (error) { toast.error('Erro ao deletar: ' + error.message); return; }
+    const oldUrl = variant === 'horizontal' ? current.image_url : current.image_url_vertical;
+    const oldPath = extractStoragePath(oldUrl);
+
+    if (variant === 'vertical') {
+      const { error } = await supabase
+        .from('hero_images')
+        .update({ image_url_vertical: null, updated_at: new Date().toISOString() })
+        .eq('id', current.id);
+      if (error) { toast.error('Erro ao remover: ' + error.message); return; }
+    } else {
+      // Horizontal is the required one — delete the entire row.
+      const { error } = await supabase.from('hero_images').delete().eq('id', current.id);
+      if (error) { toast.error('Erro ao remover: ' + error.message); return; }
+      const vPath = extractStoragePath(current.image_url_vertical);
+      if (vPath) await supabase.storage.from('media').remove([vPath]);
+    }
+
     if (oldPath) await supabase.storage.from('media').remove([oldPath]);
     toast.success('Imagem removida');
     await fetchCurrent();
-    qc.invalidateQueries({ queryKey: ['hero_images'] });
+    invalidate();
   };
 
-  return (
-    <div className="space-y-6">
+  const Slot = ({ variant, label, hint, ratioClass, currentUrl }: {
+    variant: Variant;
+    label: string;
+    hint: string;
+    ratioClass: string;
+    currentUrl: string | null;
+  }) => (
+    <div className="space-y-3">
       <div>
-        <h2 className="text-foreground text-xl font-semibold mb-1">Imagem Hero</h2>
-        <p className="text-xs text-muted-foreground">Apenas uma imagem por vez. O upload substitui a atual automaticamente.</p>
+        <h3 className="text-foreground text-sm font-semibold">{label}</h3>
+        <p className="text-xs text-muted-foreground">{hint}</p>
       </div>
 
-      {current && (
-        <div className="glass rounded-xl p-4 relative">
-          <img src={current.image_url} alt="hero" className="w-full rounded-xl aspect-[21/9] object-cover" />
+      {currentUrl && (
+        <div className="glass rounded-xl p-3 relative">
+          <img src={currentUrl} alt={label} className={`w-full rounded-lg ${ratioClass} object-cover`} />
           <button
-            onClick={handleDelete}
-            className="absolute top-6 right-6 glass rounded-full p-2 text-muted-foreground hover:text-destructive transition-colors"
-            aria-label="Remover imagem hero"
+            onClick={() => handleDelete(variant)}
+            className="absolute top-5 right-5 glass rounded-full p-2 text-muted-foreground hover:text-destructive transition-colors"
+            aria-label={`Remover hero ${label}`}
           >
             <Trash2 className="h-4 w-4" />
           </button>
@@ -107,11 +137,15 @@ export function HeroManager() {
       )}
 
       <label className="cursor-pointer block">
-        <div className="glass rounded-xl p-6 border-2 border-dashed border-border flex items-center justify-center hover:border-accent/50 transition-colors">
+        <div className="glass rounded-xl p-5 border-2 border-dashed border-border flex items-center justify-center hover:border-accent/50 transition-colors">
           <div className="text-center">
-            <Upload className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+            <Upload className="h-7 w-7 text-muted-foreground mx-auto mb-2" />
             <p className="text-sm text-muted-foreground">
-              {uploading ? 'Enviando...' : current ? 'Clique para substituir a imagem atual' : 'Clique para fazer upload'}
+              {uploading === variant
+                ? 'Enviando...'
+                : currentUrl
+                  ? 'Clique para substituir'
+                  : 'Clique para fazer upload'}
             </p>
           </div>
         </div>
@@ -119,10 +153,43 @@ export function HeroManager() {
           type="file"
           accept="image/*"
           className="hidden"
-          disabled={uploading}
-          onChange={e => { const f = e.target.files?.[0]; if (f) handleUpload(f); e.target.value = ''; }}
+          disabled={uploading !== null}
+          onChange={e => {
+            const f = e.target.files?.[0];
+            if (f) handleUpload(f, variant);
+            e.target.value = '';
+          }}
         />
       </label>
+    </div>
+  );
+
+  return (
+    <div className="space-y-8">
+      <div>
+        <h2 className="text-foreground text-xl font-semibold mb-1">Imagem Hero</h2>
+        <p className="text-xs text-muted-foreground">
+          Envie duas versões: <strong>16:9</strong> (desktop/tablet em paisagem) e <strong>4:3</strong> (mobile/retrato).
+          O site escolhe automaticamente conforme a orientação da tela.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Slot
+          variant="horizontal"
+          label="Versão Horizontal (16:9)"
+          hint="Exibida em telas largas (PC e tablets em paisagem)."
+          ratioClass="aspect-[16/9]"
+          currentUrl={current?.image_url ?? null}
+        />
+        <Slot
+          variant="vertical"
+          label="Versão Vertical (4:3)"
+          hint="Exibida em smartphones e telas em modo retrato."
+          ratioClass="aspect-[4/3]"
+          currentUrl={current?.image_url_vertical ?? null}
+        />
+      </div>
     </div>
   );
 }
