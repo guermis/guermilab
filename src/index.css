@@ -80,6 +80,15 @@
     @apply border-border;
   }
 
+  html {
+    /* Smooth, native anchor / programmatic scroll */
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-body);
@@ -87,6 +96,9 @@
     -moz-osx-font-smoothing: grayscale;
     background: var(--bg-gradient);
     background-attachment: fixed;
+    /* Soft inertial scrolling on iOS / trackpads */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: none;
   }
 
   h1, h2, h3, h4, h5, h6 {

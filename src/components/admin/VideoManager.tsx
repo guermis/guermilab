@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Check, Edit2, GripVertical, Trash2, Upload, X } from 'lucide-react';
 import type { VideoItem } from '@/types/models';
@@ -97,10 +98,18 @@ export function VideoManager({ type }: Props) {
     fetchItems();
   };
 
+  const isVertical = type === 'vertical';
+  const embedHelp = isVertical
+    ? 'Cole o código de incorporação (embed) do Instagram OU o link público do post/reel (ex: https://www.instagram.com/p/XXXX/).'
+    : 'Cole o código de incorporação (embed) do YouTube OU o link do vídeo (ex: https://www.youtube.com/watch?v=XXXX).';
+  const embedPlaceholder = isVertical
+    ? '<blockquote class="instagram-media" ...> ou https://www.instagram.com/p/...'
+    : '<iframe src="https://www.youtube.com/embed/..."></iframe> ou https://www.youtube.com/watch?v=...';
+
   return (
     <div className="space-y-6">
       <h2 className="text-foreground text-xl font-semibold">
-        Vídeos {type === 'vertical' ? 'Verticais (9:16)' : 'Horizontais (16:9)'}
+        Vídeos {isVertical ? 'Verticais (Instagram · 9:16)' : 'Horizontais (YouTube · 16:9)'}
       </h2>
 
       <div className="space-y-3">
@@ -139,7 +148,19 @@ export function VideoManager({ type }: Props) {
         <Input placeholder="Título" value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} className="bg-secondary/50 border-border" />
         <Input placeholder="Cliente / Empresa" value={form.client} onChange={e => setForm(p => ({ ...p, client: e.target.value }))} className="bg-secondary/50 border-border" />
         <Input placeholder="Duração (ex: 2:30)" value={form.duration} onChange={e => setForm(p => ({ ...p, duration: e.target.value }))} className="bg-secondary/50 border-border" />
-        <Input placeholder="Link do vídeo (YouTube, Vimeo...)" value={form.video_url} onChange={e => setForm(p => ({ ...p, video_url: e.target.value }))} className="bg-secondary/50 border-border" />
+
+        <div>
+          <label className="text-xs text-muted-foreground block mb-1">
+            {isVertical ? 'Incorporar (Instagram)' : 'Incorporar (YouTube)'}
+          </label>
+          <Textarea
+            placeholder={embedPlaceholder}
+            value={form.video_url}
+            onChange={e => setForm(p => ({ ...p, video_url: e.target.value }))}
+            className="bg-secondary/50 border-border min-h-[110px] font-mono text-xs"
+          />
+          <p className="text-[11px] text-muted-foreground mt-1">{embedHelp}</p>
+        </div>
 
         <div>
           <label className="text-xs text-muted-foreground block mb-1">Thumbnail</label>
