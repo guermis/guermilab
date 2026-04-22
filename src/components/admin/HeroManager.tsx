@@ -52,12 +52,15 @@ export function HeroManager() {
       const { data: { publicUrl } } = supabase.storage.from('media').getPublicUrl(path);
 
       const previous = current;
-      const column = variant === 'horizontal' ? 'image_url' : 'image_url_vertical';
+      const updatePayload =
+        variant === 'horizontal'
+          ? { image_url: publicUrl, updated_at: new Date().toISOString() }
+          : { image_url_vertical: publicUrl, updated_at: new Date().toISOString() };
 
       if (previous) {
         const { error: updateError } = await supabase
           .from('hero_images')
-          .update({ [column]: publicUrl, updated_at: new Date().toISOString() })
+          .update(updatePayload)
           .eq('id', previous.id);
         if (updateError) throw updateError;
 
