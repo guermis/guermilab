@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
@@ -7,6 +8,7 @@ import { ArrowLeft, Camera, Check, Edit2, Plus, Trash2, Upload, X } from 'lucide
 import type { AlbumItem, PhotoItem } from '@/types/models';
 
 export function AlbumManager() {
+  const qc = useQueryClient();
   const [albums, setAlbums] = useState<AlbumItem[]>([]);
   const [selectedAlbum, setSelectedAlbum] = useState<AlbumItem | null>(null);
   const [newAlbumTitle, setNewAlbumTitle] = useState('');
@@ -16,7 +18,8 @@ export function AlbumManager() {
   const fetchAlbums = useCallback(async () => {
     const { data } = await supabase.from('photography_albums').select('*').order('sort_order');
     if (data) setAlbums(data);
-  }, []);
+    qc.invalidateQueries({ queryKey: ['photography_albums'] });
+  }, [qc]);
 
   useEffect(() => { fetchAlbums(); }, [fetchAlbums]);
 
@@ -109,13 +112,15 @@ export function AlbumManager() {
 }
 
 function PhotoManager({ album, onBack }: { album: AlbumItem; onBack: () => void }) {
+  const qc = useQueryClient();
   const [photos, setPhotos] = useState<PhotoItem[]>([]);
   const [uploading, setUploading] = useState(false);
 
   const fetchPhotos = useCallback(async () => {
     const { data } = await supabase.from('photography_photos').select('*').eq('album_id', album.id).order('sort_order');
     if (data) setPhotos(data);
-  }, [album.id]);
+    qc.invalidateQueries({ queryKey: ['photography_photos', album.id] });
+  }, [album.id, qc]);
 
   useEffect(() => { fetchPhotos(); }, [fetchPhotos]);
 
