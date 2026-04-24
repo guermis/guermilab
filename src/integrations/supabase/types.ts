@@ -659,7 +659,10 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      verify_project_password: {
+        Args: { password_attempt: string; project_slug: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
