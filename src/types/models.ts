@@ -4,8 +4,9 @@ export type AdminTab = 'hero' | 'vertical' | 'horizontal' | 'fotografia' | 'sobr
 
 export interface HeroImageItem {
   id: string;
-  image_url: string;                  // Horizontal (16:9) — desktop/tablet landscape
-  image_url_vertical: string | null;  // Vertical (4:3) — mobile / portrait
+  image_url: string | null;           // Legacy, optional
+  image_url_vertical: string | null;  // Legacy, optional
+  video_url: string | null;           // 16:9 hero video (autoplay, muted, loop)
   sort_order: number;
 }
 
