@@ -1,32 +1,30 @@
 import { useHeroImages } from '@/hooks/useSupabaseData';
-import { PROJECTS } from '@/data/projects';
 
 export function StreamingHero() {
-  const { data: heroImages } = useHeroImages();
+  const { data: heroImages, loading } = useHeroImages();
   const hero = heroImages[0];
-
-  const fallback = PROJECTS[0]?.heroImage || '/placeholder.svg';
-  const horizontalUrl = hero?.image_url || fallback;
-  const verticalUrl = hero?.image_url_vertical || hero?.image_url || fallback;
+  const videoUrl = hero?.video_url ?? null;
 
   return (
     <section className="relative w-full mb-14">
-      {/* Vertical (mobile / portrait) — 4:3 */}
-      <div className="relative overflow-hidden rounded-3xl aspect-[4/3] md:hidden">
-        <img
-          src={verticalUrl}
-          alt="Hero"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-      </div>
-
-      {/* Horizontal (tablet landscape and up) — 16:9 */}
-      <div className="relative overflow-hidden rounded-3xl aspect-[16/9] hidden md:block">
-        <img
-          src={horizontalUrl}
-          alt="Hero"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
+      <div className="relative overflow-hidden rounded-3xl aspect-[16/9] bg-secondary/40">
+        {videoUrl ? (
+          <video
+            key={videoUrl}
+            src={videoUrl}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        ) : (
+          // Quiet placeholder — no flash of stale image while loading
+          <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-sm">
+            {loading ? '' : 'Envie um vídeo no painel admin para exibir aqui.'}
+          </div>
+        )}
       </div>
     </section>
   );
