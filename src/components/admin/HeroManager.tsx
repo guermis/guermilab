@@ -5,17 +5,15 @@ import { toast } from 'sonner';
 import { Trash2, Upload } from 'lucide-react';
 import type { HeroImageItem } from '@/types/models';
 
-type Variant = 'horizontal' | 'vertical';
-
 /**
- * Hero singleton manager: a single row holds BOTH the horizontal (16:9)
- * and vertical (4:3) hero images. Each upload atomically replaces its
- * variant (DB column + storage object).
+ * Hero singleton manager — single 16:9 video.
+ * The hero is now a video (autoplay/muted/loop) instead of an image,
+ * to eliminate any "flash of stale image" while loading.
  */
 export function HeroManager() {
   const qc = useQueryClient();
   const [current, setCurrent] = useState<HeroImageItem | null>(null);
-  const [uploading, setUploading] = useState<Variant | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const fetchCurrent = useCallback(async () => {
     const { data } = await supabase
@@ -38,101 +36,91 @@ export function HeroManager() {
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ['hero_images'] });
 
-  const handleUpload = async (file: File, variant: Variant) => {
-    setUploading(variant);
+  const handleUpload = async (file: File) => {
+    if (!file.type.startsWith('video/')) {
+      toast.error('Envie um arquivo de vídeo (MP4, WebM...).');
+      return;
+    }
+    setUploading(true);
     try {
       const ext = file.name.split('.').pop();
-      const path = `hero/${variant}-${Date.now()}.${ext}`;
+      const path = `hero/video-${Date.now()}.${ext}`;
 
       const { error: uploadError } = await supabase.storage
         .from('media')
-        .upload(path, file, { cacheControl: '3600', upsert: false });
+        .upload(path, file, { cacheControl: '3600', upsert: false, contentType: file.type });
       if (uploadError) throw uploadError;
 
       const { data: { publicUrl } } = supabase.storage.from('media').getPublicUrl(path);
 
       const previous = current;
-      const updatePayload =
-        variant === 'horizontal'
-          ? { image_url: publicUrl, updated_at: new Date().toISOString() }
-          : { image_url_vertical: publicUrl, updated_at: new Date().toISOString() };
-
       if (previous) {
         const { error: updateError } = await supabase
           .from('hero_images')
-          .update(updatePayload)
+          .update({ video_url: publicUrl, updated_at: new Date().toISOString() })
           .eq('id', previous.id);
         if (updateError) throw updateError;
 
-        const oldUrl = variant === 'horizontal' ? previous.image_url : previous.image_url_vertical;
-        const oldPath = extractStoragePath(oldUrl);
+        const oldPath = extractStoragePath(previous.video_url);
         if (oldPath) await supabase.storage.from('media').remove([oldPath]);
       } else {
-        // First-ever insert: image_url is NOT NULL in DB, so seed it.
-        const insertPayload = variant === 'horizontal'
-          ? { image_url: publicUrl, image_url_vertical: null, sort_order: 0 }
-          : { image_url: publicUrl, image_url_vertical: publicUrl, sort_order: 0 };
         const { error: insertError } = await supabase
           .from('hero_images')
-          .insert(insertPayload);
+          .insert({ video_url: publicUrl, sort_order: 0 });
         if (insertError) throw insertError;
       }
 
-      toast.success(`Hero ${variant === 'horizontal' ? '16:9' : '4:3'} atualizada`);
+      toast.success('Vídeo do hero atualizado');
       await fetchCurrent();
       invalidate();
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Erro desconhecido';
-      toast.error('Erro ao enviar imagem: ' + msg);
+      toast.error('Erro ao enviar vídeo: ' + msg);
     }
-    setUploading(null);
+    setUploading(false);
   };
 
-  const handleDelete = async (variant: Variant) => {
+  const handleDelete = async () => {
     if (!current) return;
-    const oldUrl = variant === 'horizontal' ? current.image_url : current.image_url_vertical;
-    const oldPath = extractStoragePath(oldUrl);
-
-    if (variant === 'vertical') {
-      const { error } = await supabase
-        .from('hero_images')
-        .update({ image_url_vertical: null, updated_at: new Date().toISOString() })
-        .eq('id', current.id);
-      if (error) { toast.error('Erro ao remover: ' + error.message); return; }
-    } else {
-      // Horizontal is the required one — delete the entire row.
-      const { error } = await supabase.from('hero_images').delete().eq('id', current.id);
-      if (error) { toast.error('Erro ao remover: ' + error.message); return; }
-      const vPath = extractStoragePath(current.image_url_vertical);
-      if (vPath) await supabase.storage.from('media').remove([vPath]);
-    }
-
+    const oldPath = extractStoragePath(current.video_url);
+    const { error } = await supabase.from('hero_images').delete().eq('id', current.id);
+    if (error) { toast.error('Erro ao remover: ' + error.message); return; }
     if (oldPath) await supabase.storage.from('media').remove([oldPath]);
-    toast.success('Imagem removida');
+    // Also clean up any legacy image files attached to this row
+    const legacyH = extractStoragePath(current.image_url);
+    const legacyV = extractStoragePath(current.image_url_vertical);
+    const toRemove = [legacyH, legacyV].filter(Boolean) as string[];
+    if (toRemove.length) await supabase.storage.from('media').remove(toRemove);
+    toast.success('Vídeo removido');
     await fetchCurrent();
     invalidate();
   };
 
-  const Slot = ({ variant, label, hint, ratioClass, currentUrl }: {
-    variant: Variant;
-    label: string;
-    hint: string;
-    ratioClass: string;
-    currentUrl: string | null;
-  }) => (
-    <div className="space-y-3">
+  return (
+    <div className="space-y-6">
       <div>
-        <h3 className="text-foreground text-sm font-semibold">{label}</h3>
-        <p className="text-xs text-muted-foreground">{hint}</p>
+        <h2 className="text-foreground text-xl font-semibold mb-1">Vídeo do Hero</h2>
+        <p className="text-xs text-muted-foreground">
+          Vídeo único <strong>16:9</strong> exibido no topo da página.
+          Reproduz automaticamente, sem som e em loop. Recomendado: MP4, &lt; 15&nbsp;MB.
+        </p>
       </div>
 
-      {currentUrl && (
+      {current?.video_url && (
         <div className="glass rounded-xl p-3 relative">
-          <img src={currentUrl} alt={label} className={`w-full rounded-lg ${ratioClass} object-cover`} />
+          <video
+            key={current.video_url}
+            src={current.video_url}
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="w-full rounded-lg aspect-video object-cover"
+          />
           <button
-            onClick={() => handleDelete(variant)}
+            onClick={handleDelete}
             className="absolute top-5 right-5 glass rounded-full p-2 text-muted-foreground hover:text-destructive transition-colors"
-            aria-label={`Remover hero ${label}`}
+            aria-label="Remover vídeo do hero"
           >
             <Trash2 className="h-4 w-4" />
           </button>
@@ -144,55 +132,26 @@ export function HeroManager() {
           <div className="text-center">
             <Upload className="h-7 w-7 text-muted-foreground mx-auto mb-2" />
             <p className="text-sm text-muted-foreground">
-              {uploading === variant
+              {uploading
                 ? 'Enviando...'
-                : currentUrl
-                  ? 'Clique para substituir'
-                  : 'Clique para fazer upload'}
+                : current?.video_url
+                  ? 'Clique para substituir o vídeo'
+                  : 'Clique para fazer upload do vídeo'}
             </p>
           </div>
         </div>
         <input
           type="file"
-          accept="image/*"
+          accept="video/*"
           className="hidden"
-          disabled={uploading !== null}
+          disabled={uploading}
           onChange={e => {
             const f = e.target.files?.[0];
-            if (f) handleUpload(f, variant);
+            if (f) handleUpload(f);
             e.target.value = '';
           }}
         />
       </label>
-    </div>
-  );
-
-  return (
-    <div className="space-y-8">
-      <div>
-        <h2 className="text-foreground text-xl font-semibold mb-1">Imagem Hero</h2>
-        <p className="text-xs text-muted-foreground">
-          Envie duas versões: <strong>16:9</strong> (desktop/tablet em paisagem) e <strong>4:3</strong> (mobile/retrato).
-          O site escolhe automaticamente conforme a orientação da tela.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Slot
-          variant="horizontal"
-          label="Versão Horizontal (16:9)"
-          hint="Exibida em telas largas (PC e tablets em paisagem)."
-          ratioClass="aspect-[16/9]"
-          currentUrl={current?.image_url ?? null}
-        />
-        <Slot
-          variant="vertical"
-          label="Versão Vertical (4:3)"
-          hint="Exibida em smartphones e telas em modo retrato."
-          ratioClass="aspect-[4/3]"
-          currentUrl={current?.image_url_vertical ?? null}
-        />
-      </div>
     </div>
   );
 }
