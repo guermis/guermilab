@@ -117,6 +117,7 @@ export default function AdminPage() {
         {activeTab === 'horizontal' && <VideoManager type="horizontal" />}
         {activeTab === 'fotografia' && <AlbumManager />}
         {activeTab === 'sobre' && <AboutManager />}
+        {activeTab === 'links' && <LinksManager />}
       </div>
     </main>
   );
