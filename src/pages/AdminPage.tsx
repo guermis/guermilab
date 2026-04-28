@@ -3,12 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Camera, FileText, Image, LogOut, Monitor, Smartphone } from 'lucide-react';
+import { ArrowLeft, Camera, FileText, Image, Link2, LogOut, Monitor, Smartphone } from 'lucide-react';
 import type { AdminTab } from '@/types/models';
 import { HeroManager } from '@/components/admin/HeroManager';
 import { VideoManager } from '@/components/admin/VideoManager';
 import { AlbumManager } from '@/components/admin/AlbumManager';
 import { AboutManager } from '@/components/admin/AboutManager';
+import { LinksManager } from '@/components/admin/LinksManager';
 
 const TABS: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
   { id: 'hero', label: 'Hero', icon: <Image className="h-3.5 w-3.5" /> },
@@ -16,6 +17,7 @@ const TABS: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
   { id: 'horizontal', label: 'Horizontal', icon: <Monitor className="h-3.5 w-3.5" /> },
   { id: 'fotografia', label: 'Fotografia', icon: <Camera className="h-3.5 w-3.5" /> },
   { id: 'sobre', label: 'Sobre', icon: <FileText className="h-3.5 w-3.5" /> },
+  { id: 'links', label: 'Links', icon: <Link2 className="h-3.5 w-3.5" /> },
 ];
 
 export default function AdminPage() {
