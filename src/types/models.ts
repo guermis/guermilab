@@ -1,6 +1,6 @@
 // Shared admin & data model types
 
-export type AdminTab = 'hero' | 'vertical' | 'horizontal' | 'fotografia' | 'sobre';
+export type AdminTab = 'hero' | 'vertical' | 'horizontal' | 'fotografia' | 'sobre' | 'links';
 
 export interface HeroImageItem {
   id: string;
