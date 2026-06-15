@@ -86,11 +86,7 @@ export function HeroManager() {
     const { error } = await supabase.from('hero_images').delete().eq('id', current.id);
     if (error) { toast.error('Erro ao remover: ' + error.message); return; }
     if (oldPath) await supabase.storage.from('media').remove([oldPath]);
-    // Also clean up any legacy image files attached to this row
-    const legacyH = extractStoragePath(current.image_url);
-    const legacyV = extractStoragePath(current.image_url_vertical);
-    const toRemove = [legacyH, legacyV].filter(Boolean) as string[];
-    if (toRemove.length) await supabase.storage.from('media').remove(toRemove);
+
     toast.success('Vídeo removido');
     await fetchCurrent();
     invalidate();
