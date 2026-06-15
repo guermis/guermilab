@@ -240,8 +240,6 @@ export type Database = {
         Row: {
           created_at: string
           id: string
-          image_url: string | null
-          image_url_vertical: string | null
           sort_order: number
           updated_at: string
           video_url: string | null
@@ -249,8 +247,6 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
-          image_url?: string | null
-          image_url_vertical?: string | null
           sort_order?: number
           updated_at?: string
           video_url?: string | null
@@ -258,8 +254,6 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
-          image_url?: string | null
-          image_url_vertical?: string | null
           sort_order?: number
           updated_at?: string
           video_url?: string | null
