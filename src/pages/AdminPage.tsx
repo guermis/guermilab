@@ -29,6 +29,8 @@ export default function AdminPage() {
   const [loginError, setLoginError] = useState('');
   const [activeTab, setActiveTab] = useState<AdminTab>('hero');
   const navigate = useNavigate();
+  const { isAdmin, loading: roleLoading } = useIsAdmin();
+
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
