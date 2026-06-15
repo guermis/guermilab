@@ -127,3 +127,56 @@ export function useAboutContent() {
   useErrorToast(query.isError, 'o conteúdo da seção sobre');
   return { data: query.data ?? null, loading: query.isLoading, refetch: query.refetch };
 }
+
+// ---- Links page ----
+
+export interface LinksProfileItem {
+  id: string;
+  avatar_url: string | null;
+  name: string;
+  description: string;
+}
+
+export interface LinkButtonItem {
+  id: string;
+  title: string;
+  url: string;
+  icon_url: string | null;
+  sort_order: number;
+}
+
+export function useLinksProfile() {
+  const query = useQuery({
+    queryKey: ['links_profile'],
+    staleTime: STALE_TIME,
+    queryFn: async (): Promise<LinksProfileItem | null> => {
+      const { data, error } = await supabase
+        .from('links_profile')
+        .select('*')
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return (data as LinksProfileItem) ?? null;
+    },
+  });
+  useErrorToast(query.isError, 'o perfil de links');
+  return { data: query.data ?? null, loading: query.isLoading, refetch: query.refetch };
+}
+
+export function useLinks() {
+  const query = useQuery({
+    queryKey: ['links'],
+    staleTime: STALE_TIME,
+    queryFn: async (): Promise<LinkButtonItem[]> => {
+      const { data, error } = await supabase
+        .from('links')
+        .select('*')
+        .order('sort_order');
+      if (error) throw error;
+      return (data as LinkButtonItem[]) ?? [];
+    },
+  });
+  useErrorToast(query.isError, 'os links');
+  return { data: query.data ?? [], loading: query.isLoading, refetch: query.refetch };
+}
+
