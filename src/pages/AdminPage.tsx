@@ -10,6 +10,7 @@ import { VideoManager } from '@/components/admin/VideoManager';
 import { AlbumManager } from '@/components/admin/AlbumManager';
 import { AboutManager } from '@/components/admin/AboutManager';
 import { LinksManager } from '@/components/admin/LinksManager';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
 
 const TABS: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
   { id: 'hero', label: 'Hero', icon: <Image className="h-3.5 w-3.5" /> },
