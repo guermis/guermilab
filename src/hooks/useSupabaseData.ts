@@ -18,7 +18,7 @@ export type Album = AlbumItem;
 export type AlbumPhoto = PhotoItem;
 export type AboutContent = AboutContentItem;
 
-const STALE_TIME = 1000 * 60; // 1 min
+const STALE_TIME = 1000 * 60 * 5; // 5 min
 
 function useErrorToast(isError: boolean, label: string) {
   useEffect(() => {
