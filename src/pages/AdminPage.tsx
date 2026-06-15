@@ -10,6 +10,7 @@ import { VideoManager } from '@/components/admin/VideoManager';
 import { AlbumManager } from '@/components/admin/AlbumManager';
 import { AboutManager } from '@/components/admin/AboutManager';
 import { LinksManager } from '@/components/admin/LinksManager';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
 
 const TABS: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
   { id: 'hero', label: 'Hero', icon: <Image className="h-3.5 w-3.5" /> },
@@ -28,6 +29,8 @@ export default function AdminPage() {
   const [loginError, setLoginError] = useState('');
   const [activeTab, setActiveTab] = useState<AdminTab>('hero');
   const navigate = useNavigate();
+  const { isAdmin, loading: roleLoading } = useIsAdmin();
+
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -56,13 +59,33 @@ export default function AdminPage() {
     setIsLoggedIn(false);
   };
 
-  if (isLoading) {
+  if (isLoading || (isLoggedIn && roleLoading)) {
     return (
       <main className="min-h-screen bg-background flex items-center justify-center">
         <p className="text-muted-foreground">Carregando...</p>
       </main>
     );
   }
+
+  if (isLoggedIn && !isAdmin) {
+    return (
+      <main className="min-h-screen bg-background flex items-center justify-center px-6">
+        <div className="glass rounded-2xl p-8 w-full max-w-sm glass-glow text-center">
+          <h1 className="text-foreground text-lg font-semibold mb-2">Acesso restrito</h1>
+          <p className="text-xs text-muted-foreground mb-6">
+            Sua conta não possui permissão de administrador.
+          </p>
+          <Button
+            onClick={handleLogout}
+            className="w-full rounded-full bg-accent text-accent-foreground hover:bg-accent/90"
+          >
+            Sair
+          </Button>
+        </div>
+      </main>
+    );
+  }
+
 
   if (!isLoggedIn) {
     return (

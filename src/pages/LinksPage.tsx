@@ -1,44 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-
-interface LinksProfile {
-  id: string;
-  avatar_url: string | null;
-  name: string;
-  description: string;
-}
-
-interface LinkItem {
-  id: string;
-  title: string;
-  url: string;
-  icon_url: string | null;
-  sort_order: number;
-}
+import { useLinks, useLinksProfile } from '@/hooks/useSupabaseData';
 
 export default function LinksPage() {
-  const [profile, setProfile] = useState<LinksProfile | null>(null);
-  const [links, setLinks] = useState<LinkItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: profile, loading: profileLoading } = useLinksProfile();
+  const { data: links, loading: linksLoading } = useLinks();
+  const loading = profileLoading || linksLoading;
 
   useEffect(() => {
-    document.title = profile?.name
-      ? `${profile.name} — Links`
-      : 'Links';
+    document.title = profile?.name ? `${profile.name} — Links` : 'Links';
   }, [profile?.name]);
 
-  useEffect(() => {
-    (async () => {
-      const [{ data: p }, { data: l }] = await Promise.all([
-        supabase.from('links_profile').select('*').limit(1).maybeSingle(),
-        supabase.from('links').select('*').order('sort_order'),
-      ]);
-      setProfile((p as LinksProfile) ?? null);
-      setLinks((l as LinkItem[]) ?? []);
-      setLoading(false);
-    })();
-  }, []);
 
   return (
     <main className="min-h-screen bg-background bg-ambient film-grain flex items-start justify-center px-5 py-16 md:py-24 relative">
