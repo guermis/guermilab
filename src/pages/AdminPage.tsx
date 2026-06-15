@@ -59,13 +59,33 @@ export default function AdminPage() {
     setIsLoggedIn(false);
   };
 
-  if (isLoading) {
+  if (isLoading || (isLoggedIn && roleLoading)) {
     return (
       <main className="min-h-screen bg-background flex items-center justify-center">
         <p className="text-muted-foreground">Carregando...</p>
       </main>
     );
   }
+
+  if (isLoggedIn && !isAdmin) {
+    return (
+      <main className="min-h-screen bg-background flex items-center justify-center px-6">
+        <div className="glass rounded-2xl p-8 w-full max-w-sm glass-glow text-center">
+          <h1 className="text-foreground text-lg font-semibold mb-2">Acesso restrito</h1>
+          <p className="text-xs text-muted-foreground mb-6">
+            Sua conta não possui permissão de administrador.
+          </p>
+          <Button
+            onClick={handleLogout}
+            className="w-full rounded-full bg-accent text-accent-foreground hover:bg-accent/90"
+          >
+            Sair
+          </Button>
+        </div>
+      </main>
+    );
+  }
+
 
   if (!isLoggedIn) {
     return (
