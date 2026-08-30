@@ -207,3 +207,7 @@
     z-index: 0;
   }
 }
+
+#lovable-badge {
+  display: none !important;
+}
