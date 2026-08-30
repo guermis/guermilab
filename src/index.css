@@ -87,8 +87,7 @@
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background: var(--bg-gradient);
-    background-attachment: fixed;
+    background: #0f0f0f;
     /* Soft inertial scrolling on iOS / trackpads */
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: none;
@@ -127,14 +126,6 @@
 
   .hero-overlay {
     background: var(--hero-overlay);
-  }
-
-  .glow-primary {
-    box-shadow: var(--glow-primary);
-  }
-
-  .glow-soft {
-    box-shadow: var(--glow-soft);
   }
 
   .glass {
