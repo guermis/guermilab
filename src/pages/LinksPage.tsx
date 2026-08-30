@@ -13,11 +13,11 @@ export default function LinksPage() {
 
 
   return (
-    <main className="min-h-screen bg-background bg-ambient film-grain flex items-start justify-center px-5 py-16 md:py-24 relative">
+    <main className="min-h-screen bg-background film-grain flex items-start justify-center px-5 py-16 md:py-24 relative">
       <div className="w-full max-w-md relative z-10">
         {/* Profile */}
         <header className="flex flex-col items-center text-center mb-10">
-          <div className="w-28 h-28 rounded-full overflow-hidden glass glass-glow mb-5 flex items-center justify-center">
+          <div className="w-28 h-28 rounded-full overflow-hidden glass mb-5 flex items-center justify-center">
             {profile?.avatar_url ? (
               <img
                 src={profile.avatar_url}
@@ -47,7 +47,7 @@ export default function LinksPage() {
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="glass glass-glow rounded-2xl px-4 py-4 flex items-center gap-4 transition-all duration-300 hover:border-accent/40 hover:-translate-y-0.5 group"
+                className="glass rounded-2xl px-4 py-4 flex items-center gap-4 transition-all duration-300 hover:border-accent/40 hover:-translate-y-0.5 group"
               >
                 <span className="w-10 h-10 rounded-xl bg-secondary/60 flex items-center justify-center shrink-0 overflow-hidden">
                   {link.icon_url ? (

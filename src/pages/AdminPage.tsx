@@ -70,7 +70,7 @@ export default function AdminPage() {
   if (isLoggedIn && !isAdmin) {
     return (
       <main className="min-h-screen bg-background flex items-center justify-center px-6">
-        <div className="glass rounded-2xl p-8 w-full max-w-sm glass-glow text-center">
+        <div className="glass rounded-2xl p-8 w-full max-w-sm text-center">
           <h1 className="text-foreground text-lg font-semibold mb-2">Acesso restrito</h1>
           <p className="text-xs text-muted-foreground mb-6">
             Sua conta não possui permissão de administrador.
@@ -90,7 +90,7 @@ export default function AdminPage() {
   if (!isLoggedIn) {
     return (
       <main className="min-h-screen bg-background flex items-center justify-center">
-        <div className="glass rounded-2xl p-8 w-full max-w-sm glass-glow">
+        <div className="glass rounded-2xl p-8 w-full max-w-sm">
           <h1 className="text-foreground text-xl font-semibold mb-6 text-center">Guermi Lab Admin</h1>
           <form onSubmit={handleLogin} className="space-y-4">
             <Input placeholder="E-mail" type="email" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} className="bg-secondary/50 border-border" />

@@ -36,7 +36,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-ambient">
+    <div className="min-h-screen">
       <StreamingSidebar
         activeCategory={activeCategory}
         categories={categories}
