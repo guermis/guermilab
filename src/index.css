@@ -12,7 +12,7 @@
     --font-display: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
-    --background: 0 0% 6%;
+    --background: 0 0% 5.88%;
     --foreground: 0 0% 94%;
 
     --card: 0 0% 9%;
@@ -49,10 +49,6 @@
     --glass-blur: 48px;
     --glass-shadow: 0 8px 40px hsla(0, 0%, 0%, 0.5), 0 0 0 0.5px hsla(0, 0%, 100%, 0.05), inset 0 1px 0 hsla(0, 0%, 100%, 0.06);
 
-    /* Ambient environment */
-    --bg-gradient: radial-gradient(ellipse 120% 80% at 50% 0%, hsla(0, 0%, 10%, 1) 0%, hsla(0, 0%, 6%, 1) 70%);
-    --bg-ambient: radial-gradient(ellipse 80% 50% at 70% 20%, hsla(41, 100%, 47%, 0.06) 0%, transparent 70%);
-
     --hero-overlay: linear-gradient(
       180deg,
       hsla(0, 0%, 6%, 0) 0%,
@@ -60,9 +56,6 @@
       hsla(0, 0%, 6%, 0.85) 75%,
       hsla(0, 0%, 6%, 1) 100%
     );
-
-    --glow-primary: 0 0 80px -20px hsla(41, 100%, 47%, 0.15);
-    --glow-soft: 0 0 60px -20px hsla(41, 100%, 47%, 0.08);
 
     --sidebar-background: 0 0% 6%;
     --sidebar-foreground: 0 0% 94%;
