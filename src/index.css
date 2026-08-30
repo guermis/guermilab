@@ -179,17 +179,6 @@
     scroll-snap-align: start;
   }
 
-  .bg-ambient {
-    position: relative;
-  }
-  .bg-ambient::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: var(--bg-ambient);
-    pointer-events: none;
-    z-index: 0;
-  }
 }
 
 #lovable-badge {
