@@ -88,7 +88,7 @@ export function VideoModal({ isOpen, onClose, videoUrl, title }: VideoModalProps
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-[200] bg-[hsla(0,0%,0%,0.85)] backdrop-blur-md"
+            className="fixed inset-0 z-[200] bg-background/85 backdrop-blur-md"
             onClick={onClose}
           />
           <motion.div
@@ -112,7 +112,7 @@ export function VideoModal({ isOpen, onClose, videoUrl, title }: VideoModalProps
 
             {/* Embed area — center vertical content, fill horizontal content */}
             <div
-              className={`flex-1 rounded-2xl overflow-hidden bg-black ${
+              className={`flex-1 rounded-2xl overflow-hidden bg-background ${
                 isInstagramVertical ? 'flex items-center justify-center overflow-y-auto' : ''
               }`}
             >

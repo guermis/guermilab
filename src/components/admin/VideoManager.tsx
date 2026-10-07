@@ -123,7 +123,7 @@ export function VideoManager({ type }: Props) {
               <GripVertical className="h-4 w-4" />
             </button>
             {item.thumbnail_url && (
-              <img src={item.thumbnail_url} alt="" className="h-14 w-14 rounded-lg object-cover shrink-0" />
+              <img loading="lazy" decoding="async" src={item.thumbnail_url} alt="" className="h-14 w-14 rounded-lg object-cover shrink-0" />
             )}
             <div className="flex-1 min-w-0">
               <p className="text-sm text-foreground font-medium truncate">{item.title}</p>
@@ -175,7 +175,7 @@ export function VideoManager({ type }: Props) {
                 }
               }} />
             </label>
-            {form.thumbnail_url && <img src={form.thumbnail_url} alt="preview" className="h-10 w-10 rounded-lg object-cover" />}
+            {form.thumbnail_url && <img loading="lazy" decoding="async" src={form.thumbnail_url} alt="preview" className="h-10 w-10 rounded-lg object-cover" />}
           </div>
         </div>
 

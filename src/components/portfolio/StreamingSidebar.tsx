@@ -30,11 +30,11 @@ export function StreamingSidebar({ activeCategory, categories, onCategoryClick, 
   const sections = ['Vertical', 'Horizontal', 'Fotografia'];
 
   const glassStyle = {
-    background: 'hsla(0, 0%, 8%, 0.55)',
+    background: 'hsl(var(--background) / 0.55)',
     backdropFilter: 'blur(48px) saturate(1.8)',
     WebkitBackdropFilter: 'blur(48px) saturate(1.8)',
-    border: '1px solid hsla(0, 0%, 100%, 0.08)',
-    boxShadow: '0 8px 40px hsla(0, 0%, 0%, 0.45), 0 0 0 0.5px hsla(0, 0%, 100%, 0.05), inset 0 1px 0 hsla(0, 0%, 100%, 0.06)',
+    border: '1px solid var(--glass-border)',
+    boxShadow: 'var(--glass-shadow)',
   };
 
   const sidebarContent = (closeFn: () => void) => (
@@ -55,7 +55,7 @@ export function StreamingSidebar({ activeCategory, categories, onCategoryClick, 
           <button
             key={item.id}
             onClick={() => { onNavClick(item.id); closeFn(); }}
-            className="flex items-center gap-3 w-full px-5 py-3 rounded-2xl text-[13px] font-medium text-muted-foreground hover:text-foreground hover:bg-[hsla(0,0%,100%,0.06)] transition-all duration-500 ease-out"
+            className="flex items-center gap-3 w-full px-5 py-3 rounded-2xl text-[13px] font-medium text-muted-foreground hover:text-foreground hover:bg-foreground/5 transition-all duration-500 ease-out"
           >
             <item.icon className="h-[18px] w-[18px] opacity-60" />
             <span>{item.label}</span>
@@ -64,7 +64,7 @@ export function StreamingSidebar({ activeCategory, categories, onCategoryClick, 
       </div>
 
       {/* Divider */}
-      <div className="mx-7 h-px bg-[hsla(0,0%,100%,0.06)] mb-8" />
+      <div className="mx-7 h-px bg-foreground/5 mb-8" />
 
       {/* Sections */}
       <div className="px-4 flex-1">
@@ -76,7 +76,7 @@ export function StreamingSidebar({ activeCategory, categories, onCategoryClick, 
           className={`flex items-center gap-3 w-full px-5 py-3 rounded-2xl text-[13px] font-medium transition-all duration-500 ease-out ${
             activeCategory === null
               ? 'bg-foreground/10 text-foreground'
-              : 'text-muted-foreground hover:text-foreground hover:bg-[hsla(0,0%,100%,0.06)]'
+              : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'
           }`}
         >
           <Film className="h-[18px] w-[18px] opacity-60" />
@@ -99,7 +99,7 @@ export function StreamingSidebar({ activeCategory, categories, onCategoryClick, 
               className={`flex items-center gap-3 w-full px-5 py-3 rounded-2xl text-[13px] font-medium transition-all duration-500 ease-out ${
                 isActive
                   ? 'bg-foreground/10 text-foreground'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-[hsla(0,0%,100%,0.06)]'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'
               }`}
             >
               <Icon className="h-[18px] w-[18px] opacity-60" />
@@ -140,7 +140,7 @@ export function StreamingSidebar({ activeCategory, categories, onCategoryClick, 
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4 }}
-              className="fixed inset-0 z-[100] bg-[hsla(0,0%,4%,0.7)] backdrop-blur-sm"
+              className="fixed inset-0 z-[100] bg-background/70 backdrop-blur-sm"
               onClick={() => setOpen(false)}
             />
             <motion.aside

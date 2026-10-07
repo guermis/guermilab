@@ -23,7 +23,7 @@ export default function LinksPage() {
                 src={profile.avatar_url}
                 alt={profile.name || 'Avatar'}
                 className="w-full h-full object-cover"
-                loading="eager"
+                loading="lazy"
               />
             ) : (
               <div className="w-full h-full bg-secondary" />

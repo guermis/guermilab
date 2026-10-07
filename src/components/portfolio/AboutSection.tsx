@@ -15,7 +15,7 @@ export function AboutSection() {
   const description = about?.description || 'Com mais de uma década de experiência em produção audiovisual, especializo-me em criar narrativas visuais que transcendem o ordinário.';
 
   return (
-    <section id="about" className="relative py-20 mt-8">
+    <section className="relative py-20 mt-8">
       <div ref={ref} className="mx-auto max-w-5xl">
         <div className={`grid gap-12 md:grid-cols-2 ${isInView ? 'animate-fade-in' : 'opacity-0'}`}>
           <div className="glass rounded-2xl p-8">

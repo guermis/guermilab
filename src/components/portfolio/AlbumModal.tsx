@@ -47,7 +47,7 @@ export function AlbumModal({ album, onClose }: AlbumModalProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-[hsla(0,0%,0%,0.9)] backdrop-blur-xl"
+            className="fixed inset-0 z-[200] bg-background/90 backdrop-blur-xl"
             onClick={onClose}
           />
 
@@ -84,8 +84,8 @@ export function AlbumModal({ album, onClose }: AlbumModalProps) {
                     loading="lazy"
                     className="h-full w-full object-cover transition-all duration-500 group-hover:scale-105 group-hover:brightness-110"
                   />
-                  <div className="absolute inset-0 rounded-2xl transition-all duration-500"
-                    style={{ boxShadow: 'inset 0 0 0 1px hsla(0,0%,100%,0.06)' }}
+                  <div className="absolute inset-0 rounded-2xl border border-foreground/5 transition-all duration-500"
+                    
                   />
                 </div>
               ))}
@@ -99,7 +99,7 @@ export function AlbumModal({ album, onClose }: AlbumModalProps) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[300] bg-[hsla(0,0%,0%,0.95)] flex items-center justify-center"
+                className="fixed inset-0 z-[300] bg-background/95 flex items-center justify-center"
                 onClick={() => setLightboxIndex(null)}
               >
                 <button
@@ -127,7 +127,7 @@ export function AlbumModal({ album, onClose }: AlbumModalProps) {
                   </button>
                 )}
 
-                <img
+                <img loading="lazy" decoding="async"
                   src={displayPhotos[lightboxIndex].image_url}
                   alt=""
                   className="max-h-[90vh] max-w-[90vw] object-contain rounded-xl"

@@ -1,0 +1,4 @@
+- [x] Defer below-the-fold content and split media modals on first click.
+- [x] Add uninterrupted hero sound toggle with muted autoplay.
+- [x] Apply global charcoal/off-white/orange tokens and lazy image loading.
+- [x] Document WebP usage and verify live behavior.

@@ -72,7 +72,7 @@ export function AlbumManager() {
           <div key={album.id} className="glass rounded-xl p-4 flex items-center gap-4">
             <div className="h-14 w-14 rounded-lg overflow-hidden shrink-0 bg-secondary">
               {album.cover_image_url ? (
-                <img src={album.cover_image_url} alt="" className="h-full w-full object-cover" />
+                <img loading="lazy" decoding="async" src={album.cover_image_url} alt="" className="h-full w-full object-cover" />
               ) : (
                 <div className="h-full w-full flex items-center justify-center"><Camera className="h-5 w-5 text-muted-foreground" /></div>
               )}
@@ -167,7 +167,7 @@ function PhotoManager({ album, onBack }: { album: AlbumItem; onBack: () => void 
       <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
         {photos.map(photo => (
           <div key={photo.id} className="relative group rounded-xl overflow-hidden aspect-[3/4]">
-            <img src={photo.image_url} alt="" className="h-full w-full object-cover" />
+            <img loading="lazy" decoding="async" src={photo.image_url} alt="" className="h-full w-full object-cover" />
             <button
               onClick={() => deletePhoto(photo.id)}
               className="absolute top-2 right-2 glass rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"

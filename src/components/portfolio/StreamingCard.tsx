@@ -59,15 +59,15 @@ export function StreamingCard({ slug, title, category, client, thumbnail, durati
           />
 
           {/* Subtle bottom gradient for badge legibility */}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[hsla(0,0%,0%,0.35)] via-transparent to-transparent" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/35 via-transparent to-transparent" />
 
           {/* Border refinement on hover */}
           <div
             className="pointer-events-none absolute inset-0 rounded-2xl transition-shadow duration-[500ms] ease-out"
             style={{
               boxShadow: isHovered
-                ? 'inset 0 0 0 1px hsla(0, 0%, 100%, 0.14), 0 12px 32px -10px hsla(0, 0%, 0%, 0.55)'
-                : 'inset 0 0 0 1px hsla(0, 0%, 100%, 0.04), 0 4px 14px -6px hsla(0, 0%, 0%, 0.3)',
+                ? 'var(--media-hover-shadow)'
+                : 'var(--media-shadow)',
             }}
           />
 
@@ -76,7 +76,7 @@ export function StreamingCard({ slug, title, category, client, thumbnail, durati
             className="absolute inset-0 flex items-center justify-center transition-all duration-[500ms] ease-out pointer-events-none"
             style={{ opacity: isHovered ? 1 : 0, transform: isHovered ? 'scale(1)' : 'scale(0.85)' }}
           >
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[hsla(0,0%,100%,0.15)] backdrop-blur-xl border border-[hsla(0,0%,100%,0.15)]">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-foreground/15 backdrop-blur-xl border border-foreground/15">
               {isPhotography ? (
                 <ImageIcon className="h-5 w-5 text-foreground" />
               ) : (
@@ -87,7 +87,7 @@ export function StreamingCard({ slug, title, category, client, thumbnail, durati
 
           {/* Duration badge (video only) */}
           {duration && !isPhotography && (
-            <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-[hsla(0,0%,0%,0.55)] backdrop-blur-lg rounded-lg px-2.5 py-1 border border-[hsla(0,0%,100%,0.06)]">
+            <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-background/55 backdrop-blur-lg rounded-lg px-2.5 py-1 border border-foreground/5">
               <Clock className="h-3 w-3 text-foreground/60" />
               <span className="text-[10px] text-foreground/60 font-medium">{duration}</span>
             </div>
