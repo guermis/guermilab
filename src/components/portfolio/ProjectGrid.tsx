@@ -89,14 +89,14 @@ export function ProjectGrid({ activeCategory = null, onVideoClick, onAlbumClick 
 
   if (visible.length === 0) {
     return (
-      <section id="work" className="py-24 text-center">
+      <section className="py-24 text-center">
         <p className="text-sm text-muted-foreground">Nenhum projeto disponível ainda.</p>
       </section>
     );
   }
 
   return (
-    <section id="work" className="py-8">
+    <section className="py-8">
       {visible.map(({ key, title, aspect, projects, isPhotography }) => (
         <StreamingRow
           key={key}

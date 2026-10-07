@@ -5,7 +5,7 @@ export function ContactSection() {
   const { ref, isInView } = useInView();
 
   return (
-    <section id="contact" className="relative py-20 mt-8">
+    <section className="relative py-20 mt-8">
       <div ref={ref} className={`mx-auto max-w-3xl text-center ${isInView ? 'animate-fade-in' : 'opacity-0'}`}>
         <div className="glass rounded-2xl p-8 md:p-12">
           <span className="text-[10px] tracking-[0.3em] uppercase text-accent font-body">
