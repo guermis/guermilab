@@ -19,7 +19,7 @@ export function HeroSection() {
     <section className="relative h-screen w-full overflow-hidden film-grain letterbox">
       {/* Background image with Ken Burns */}
       <div className="absolute inset-0">
-        <img
+        <img loading="lazy" decoding="async"
           src="/images/hero-bg.jpg"
           alt=""
           className={`h-full w-full object-cover transition-opacity duration-1000 ${loaded ? 'opacity-100' : 'opacity-0'} animate-ken-burns`}

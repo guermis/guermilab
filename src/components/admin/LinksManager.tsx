@@ -194,7 +194,7 @@ export function LinksManager() {
         <div className="flex items-start gap-5">
           <div className="w-24 h-24 rounded-full overflow-hidden glass shrink-0 flex items-center justify-center">
             {profile?.avatar_url
-              ? <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+              ? <img loading="lazy" decoding="async" src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
               : <div className="w-full h-full bg-secondary" />}
           </div>
           <label className="cursor-pointer flex-1">
@@ -280,7 +280,7 @@ export function LinksManager() {
               <div className="flex items-center gap-3 pt-2 border-t border-border/40">
                 <div className="w-12 h-12 rounded-xl glass flex items-center justify-center overflow-hidden shrink-0">
                   {link.icon_url
-                    ? <img src={link.icon_url} alt="" className="w-7 h-7 object-contain" />
+                    ? <img loading="lazy" decoding="async" src={link.icon_url} alt="" className="w-7 h-7 object-contain" />
                     : <ImagePlus className="h-5 w-5 text-muted-foreground" />}
                 </div>
                 <div className="flex-1">
