@@ -73,6 +73,10 @@ export function AlbumModal({ album, onClose }: AlbumModalProps) {
 
             {/* Photo grid */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+              {photosLoading && photos.length === 0 &&
+                [0, 1, 2, 3, 4, 5].map(i => (
+                  <div key={`skel-${i}`} className="rounded-2xl aspect-[3/4] bg-secondary/60 animate-pulse" />
+                ))}
               {displayPhotos.map((photo, i) => (
                 <div
                   key={photo.id}
