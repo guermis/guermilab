@@ -118,6 +118,17 @@ export function VideoManager({ type }: Props) {
         Vídeos {isVertical ? 'Verticais (Instagram · 9:16)' : 'Horizontais (YouTube · 16:9)'}
       </h2>
 
+      {loading && (
+        <div className="space-y-3">
+          {[0, 1, 2].map(i => (
+            <div key={i} className="glass rounded-xl p-4 flex items-center gap-4 animate-pulse">
+              <div className="h-14 w-14 rounded-lg bg-secondary/60 shrink-0" />
+              <div className="h-4 flex-1 rounded bg-secondary/60" />
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="space-y-3">
         {items.map((item, i) => (
           <div key={item.id} className="glass rounded-xl p-4 flex items-center gap-4">
