@@ -186,6 +186,14 @@ function PhotoManager({ album, onBack }: { album: AlbumItem; onBack: () => void 
         <h2 className="text-foreground text-xl font-semibold">{album.title} — Fotos</h2>
       </div>
 
+      {loading && (
+        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+          {[0, 1, 2, 3, 4].map(i => (
+            <div key={i} className="rounded-xl aspect-[3/4] bg-secondary/60 animate-pulse" />
+          ))}
+        </div>
+      )}
+
       <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
         {photos.map(photo => (
           <div key={photo.id} className="relative group rounded-xl overflow-hidden aspect-[3/4]">
