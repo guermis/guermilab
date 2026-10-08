@@ -92,7 +92,7 @@ export function ProjectGrid({ activeCategory = null, onVideoClick, onAlbumClick 
   // empty state to avoid the "no projects" flicker.
   if (isLoading && visible.length === 0) {
     return (
-      <section className="py-8 space-y-10">
+      <section className="pt-2 pb-8 md:pt-8 space-y-10">
         {[0, 1].map((row) => (
           <div key={row} className="space-y-4">
             <div className="h-6 w-40 rounded bg-secondary/60 animate-pulse" />
@@ -116,7 +116,7 @@ export function ProjectGrid({ activeCategory = null, onVideoClick, onAlbumClick 
   }
 
   return (
-    <section className="py-8">
+    <section className="pt-2 pb-8 md:pt-8">
       {visible.map(({ key, title, aspect, projects, isPhotography }) => (
         <StreamingRow
           key={key}
