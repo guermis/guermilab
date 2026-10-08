@@ -73,6 +73,17 @@ export function AlbumManager() {
     <div className="space-y-6">
       <h2 className="text-foreground text-xl font-semibold">Álbuns de Fotografia</h2>
 
+      {loading && (
+        <div className="space-y-3">
+          {[0, 1, 2].map(i => (
+            <div key={i} className="glass rounded-xl p-4 flex items-center gap-4 animate-pulse">
+              <div className="h-14 w-14 rounded-lg bg-secondary/60 shrink-0" />
+              <div className="h-4 flex-1 rounded bg-secondary/60" />
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="space-y-3">
         {albums.map((album) => (
           <div key={album.id} className="glass rounded-xl p-4 flex items-center gap-4">
@@ -121,10 +132,12 @@ function PhotoManager({ album, onBack }: { album: AlbumItem; onBack: () => void 
   const qc = useQueryClient();
   const [photos, setPhotos] = useState<PhotoItem[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const fetchPhotos = useCallback(async () => {
     const { data } = await supabase.from('photography_photos').select('*').eq('album_id', album.id).order('sort_order');
     if (data) setPhotos(data);
+    setLoading(false);
     qc.invalidateQueries({ queryKey: ['photography_photos', album.id] });
   }, [album.id, qc]);
 
@@ -157,7 +170,10 @@ function PhotoManager({ album, onBack }: { album: AlbumItem; onBack: () => void 
   };
 
   const deletePhoto = async (id: string) => {
+    const photo = photos.find(p => p.id === id);
     await supabase.from('photography_photos').delete().eq('id', id);
+    // Remove the physical file from Storage as well.
+    if (photo?.image_url) await removeStorageFile(photo.image_url);
     fetchPhotos();
   };
 
