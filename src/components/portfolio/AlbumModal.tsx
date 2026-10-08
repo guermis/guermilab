@@ -10,7 +10,7 @@ interface AlbumModalProps {
 }
 
 export function AlbumModal({ album, onClose }: AlbumModalProps) {
-  const { data: photos } = useAlbumPhotos(album?.id || null);
+  const { data: photos, loading: photosLoading } = useAlbumPhotos(album?.id || null);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -28,8 +28,9 @@ export function AlbumModal({ album, onClose }: AlbumModalProps) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
-  // Demo photos when DB is empty
-  const displayPhotos = photos.length > 0 ? photos : [
+  // Demo photos only after the fetch finished and the album is really empty —
+  // while loading, show skeletons instead to avoid a placeholder flicker.
+  const displayPhotos = photos.length > 0 || photosLoading ? photos : [
     { id: '1', album_id: '', image_url: '/placeholder.svg', sort_order: 0 },
     { id: '2', album_id: '', image_url: '/placeholder.svg', sort_order: 1 },
     { id: '3', album_id: '', image_url: '/placeholder.svg', sort_order: 2 },
@@ -72,6 +73,10 @@ export function AlbumModal({ album, onClose }: AlbumModalProps) {
 
             {/* Photo grid */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+              {photosLoading && photos.length === 0 &&
+                [0, 1, 2, 3, 4, 5].map(i => (
+                  <div key={`skel-${i}`} className="rounded-2xl aspect-[3/4] bg-secondary/60 animate-pulse" />
+                ))}
               {displayPhotos.map((photo, i) => (
                 <div
                   key={photo.id}

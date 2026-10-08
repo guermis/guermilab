@@ -6,10 +6,12 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Camera, Check, Edit2, Plus, Trash2, Upload, X } from 'lucide-react';
 import type { AlbumItem, PhotoItem } from '@/types/models';
+import { removeStorageFile } from '@/lib/storage';
 
 export function AlbumManager() {
   const qc = useQueryClient();
   const [albums, setAlbums] = useState<AlbumItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedAlbum, setSelectedAlbum] = useState<AlbumItem | null>(null);
   const [newAlbumTitle, setNewAlbumTitle] = useState('');
   const [editAlbumId, setEditAlbumId] = useState<string | null>(null);
@@ -18,6 +20,7 @@ export function AlbumManager() {
   const fetchAlbums = useCallback(async () => {
     const { data } = await supabase.from('photography_albums').select('*').order('sort_order');
     if (data) setAlbums(data);
+    setLoading(false);
     qc.invalidateQueries({ queryKey: ['photography_albums'] });
   }, [qc]);
 
@@ -43,8 +46,11 @@ export function AlbumManager() {
   };
 
   const deleteAlbum = async (id: string) => {
+    const album = albums.find(a => a.id === id);
     const { error } = await supabase.from('photography_albums').delete().eq('id', id);
     if (error) { toast.error('Erro: ' + error.message); return; }
+    // Remove the physical cover file from Storage as well.
+    if (album?.cover_image_url) await removeStorageFile(album.cover_image_url);
     toast.success('Álbum removido');
     if (selectedAlbum?.id === id) setSelectedAlbum(null);
     fetchAlbums();
@@ -66,6 +72,17 @@ export function AlbumManager() {
   return (
     <div className="space-y-6">
       <h2 className="text-foreground text-xl font-semibold">Álbuns de Fotografia</h2>
+
+      {loading && (
+        <div className="space-y-3">
+          {[0, 1, 2].map(i => (
+            <div key={i} className="glass rounded-xl p-4 flex items-center gap-4 animate-pulse">
+              <div className="h-14 w-14 rounded-lg bg-secondary/60 shrink-0" />
+              <div className="h-4 flex-1 rounded bg-secondary/60" />
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="space-y-3">
         {albums.map((album) => (
@@ -115,10 +132,12 @@ function PhotoManager({ album, onBack }: { album: AlbumItem; onBack: () => void 
   const qc = useQueryClient();
   const [photos, setPhotos] = useState<PhotoItem[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const fetchPhotos = useCallback(async () => {
     const { data } = await supabase.from('photography_photos').select('*').eq('album_id', album.id).order('sort_order');
     if (data) setPhotos(data);
+    setLoading(false);
     qc.invalidateQueries({ queryKey: ['photography_photos', album.id] });
   }, [album.id, qc]);
 
@@ -151,7 +170,10 @@ function PhotoManager({ album, onBack }: { album: AlbumItem; onBack: () => void 
   };
 
   const deletePhoto = async (id: string) => {
+    const photo = photos.find(p => p.id === id);
     await supabase.from('photography_photos').delete().eq('id', id);
+    // Remove the physical file from Storage as well.
+    if (photo?.image_url) await removeStorageFile(photo.image_url);
     fetchPhotos();
   };
 
@@ -163,6 +185,14 @@ function PhotoManager({ album, onBack }: { album: AlbumItem; onBack: () => void 
         </button>
         <h2 className="text-foreground text-xl font-semibold">{album.title} — Fotos</h2>
       </div>
+
+      {loading && (
+        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+          {[0, 1, 2, 3, 4].map(i => (
+            <div key={i} className="rounded-xl aspect-[3/4] bg-secondary/60 animate-pulse" />
+          ))}
+        </div>
+      )}
 
       <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
         {photos.map(photo => (

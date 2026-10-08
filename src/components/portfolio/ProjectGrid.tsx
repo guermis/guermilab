@@ -51,9 +51,10 @@ function albumsToProjects(albums: Album[]): Project[] {
 }
 
 export function ProjectGrid({ activeCategory = null, onVideoClick, onAlbumClick }: ProjectGridProps) {
-  const { data: verticalVideos } = useVideos('vertical');
-  const { data: horizontalVideos } = useVideos('horizontal');
-  const { data: albums } = useAlbums();
+  const { data: verticalVideos, loading: loadingVertical } = useVideos('vertical');
+  const { data: horizontalVideos, loading: loadingHorizontal } = useVideos('horizontal');
+  const { data: albums, loading: loadingAlbums } = useAlbums();
+  const isLoading = loadingVertical || loadingHorizontal || loadingAlbums;
 
   // Only render real DB data — no fallbacks, no duplicate padding.
   const sections = [
@@ -86,6 +87,25 @@ export function ProjectGrid({ activeCategory = null, onVideoClick, onAlbumClick 
     : sections;
 
   const visible = filtered.filter(s => s.projects.length > 0);
+
+  // While the initial fetch is pending, show skeleton rows instead of the
+  // empty state to avoid the "no projects" flicker.
+  if (isLoading && visible.length === 0) {
+    return (
+      <section className="py-8 space-y-10">
+        {[0, 1].map((row) => (
+          <div key={row} className="space-y-4">
+            <div className="h-6 w-40 rounded bg-secondary/60 animate-pulse" />
+            <div className="flex gap-4 overflow-hidden">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-40 w-64 shrink-0 rounded-xl bg-secondary/60 animate-pulse" />
+              ))}
+            </div>
+          </div>
+        ))}
+      </section>
+    );
+  }
 
   if (visible.length === 0) {
     return (

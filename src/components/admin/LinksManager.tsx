@@ -34,6 +34,7 @@ export function LinksManager() {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   const [links, setLinks] = useState<LinkItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [newTitle, setNewTitle] = useState('');
   const [newUrl, setNewUrl] = useState('');
   const [uploadingIconId, setUploadingIconId] = useState<string | null>(null);
@@ -48,6 +49,7 @@ export function LinksManager() {
     setName(prof?.name ?? '');
     setDescription(prof?.description ?? '');
     setLinks((l as LinkItem[]) ?? []);
+    setLoading(false);
   }, []);
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
@@ -312,7 +314,12 @@ export function LinksManager() {
               </div>
             </li>
           ))}
-          {links.length === 0 && (
+          {loading && (
+            <li className="glass rounded-xl p-4 animate-pulse">
+              <div className="h-8 rounded bg-secondary/60" />
+            </li>
+          )}
+          {!loading && links.length === 0 && (
             <li className="text-center text-xs text-muted-foreground py-6">Nenhum botão ainda.</li>
           )}
         </ul>
