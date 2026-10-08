@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Check, Edit2, GripVertical, Trash2, Upload, X } from 'lucide-react';
 import type { VideoItem } from '@/types/models';
+import { removeStorageFile } from '@/lib/storage';
 
 interface Props {
   type: 'vertical' | 'horizontal';
@@ -18,6 +19,7 @@ export function VideoManager({ type }: Props) {
   const qc = useQueryClient();
   const table = type === 'vertical' ? 'videos_vertical' : 'videos_horizontal';
   const [items, setItems] = useState<VideoItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [uploading, setUploading] = useState(false);
@@ -25,6 +27,7 @@ export function VideoManager({ type }: Props) {
   const fetchItems = useCallback(async () => {
     const { data } = await supabase.from(table).select('*').order('sort_order');
     if (data) setItems(data as VideoItem[]);
+    setLoading(false);
     qc.invalidateQueries({ queryKey: ['videos', type] });
   }, [table, qc, type]);
 
@@ -81,8 +84,11 @@ export function VideoManager({ type }: Props) {
   };
 
   const handleDelete = async (id: string) => {
+    const item = items.find(i => i.id === id);
     const { error } = await supabase.from(table).delete().eq('id', id);
     if (error) { toast.error('Erro ao deletar: ' + error.message); return; }
+    // Remove the physical thumbnail file from Storage as well.
+    if (item?.thumbnail_url) await removeStorageFile(item.thumbnail_url);
     toast.success('Vídeo removido');
     fetchItems();
   };
