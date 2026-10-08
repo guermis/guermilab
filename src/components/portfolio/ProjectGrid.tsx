@@ -51,9 +51,10 @@ function albumsToProjects(albums: Album[]): Project[] {
 }
 
 export function ProjectGrid({ activeCategory = null, onVideoClick, onAlbumClick }: ProjectGridProps) {
-  const { data: verticalVideos } = useVideos('vertical');
-  const { data: horizontalVideos } = useVideos('horizontal');
-  const { data: albums } = useAlbums();
+  const { data: verticalVideos, loading: loadingVertical } = useVideos('vertical');
+  const { data: horizontalVideos, loading: loadingHorizontal } = useVideos('horizontal');
+  const { data: albums, loading: loadingAlbums } = useAlbums();
+  const isLoading = loadingVertical || loadingHorizontal || loadingAlbums;
 
   // Only render real DB data — no fallbacks, no duplicate padding.
   const sections = [
