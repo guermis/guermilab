@@ -2,3 +2,5 @@
 - [x] Add uninterrupted hero sound toggle with muted autoplay.
 - [x] Apply global charcoal/off-white/orange tokens and lazy image loading.
 - [x] Document WebP usage and verify live behavior.
+- [ ] Update hero sound control position, timed label, and hide/reveal behavior.
+- [ ] Reduce mobile hero-to-Vertical spacing and verify interactions.
